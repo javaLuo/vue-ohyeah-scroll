@@ -2,8 +2,9 @@
   <div id="app">
     <p>a</p>
     <p>a</p>
-    <div class="demo-div">
-      <ohyeah-scroll>
+    <div ref="box"
+         class="demo-div">
+      <ohyeah-scroll trackColor="transparent">
         <ul>
           <li v-for="(item,index) in arr"
               :key="index">{{`${item}-${index}`}}</li>
@@ -11,6 +12,7 @@
       </ohyeah-scroll>
     </div>
     <button @click="add">add</button>
+    <button @click="changeBox">changeBox</button>
   </div>
 </template>
 
@@ -20,12 +22,15 @@ export default {
   data() {
     return {
       msg: "Welcome to Your Vue.js App",
-      arr: new Array(2).fill("a")
+      arr: new Array(50).fill("a")
     };
   },
   methods: {
     add() {
       this.arr.push(this.arr.length + 1);
+    },
+    changeBox() {
+      this.$refs.box.style.height = Math.random() * 200 + 300 + "px";
     }
   }
 };

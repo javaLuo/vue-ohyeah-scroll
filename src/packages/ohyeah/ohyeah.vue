@@ -5,19 +5,21 @@
     <div @mousedown.stop="onTrackMousedown($event,1)"
          @mouseenter.stop="hoverH = true"
          @mouseleave.stop="hoverH = false"
+         :style="`background-color:${trackColor};`"
          :class="['ohyeah-scroll-vertical-track-h',{'disabled': !isShowH},{'show': barHDown }]">
       <div @mousedown.stop="onBarMousedown($event, 1)"
            ref="ohyeahbarh"
-           :style="`width:${(hoverH || barHDown )? breadth + 4 : breadth}px;height: ${barHTall}px;transform: translateY(${barHScrollTop}px);border-radius:${breadth}px`"></div>
+           :style="`background-color:${thumbColor};width:${(hoverH || barHDown )? breadth + 4 : breadth}px;height: ${barHTall}px;transform: translateY(${barHScrollTop}px);border-radius:${breadth}px`"></div>
     </div>
     <!-- 横向滚动条 -->
     <div @mousedown.stop="onTrackMousedown($event,2)"
          @mouseenter.stop="hoverW = true"
          @mouseleave.stop="hoverW = false"
+         :style="`background-color:${trackColor};`"
          :class="['ohyeah-scroll-vertical-track-w',{'disabled': !isShowW},{'show': barWDown }]">
       <div @mousedown.stop="onBarMousedown($event,2)"
            ref="ohyeahbarw"
-           :style="`height:${(hoverW || barWDown) ? breadth + 4 : breadth}px;width: ${barWTall}px;transform: translateX(${barWScrollLeft}px)`"></div>
+           :style="`background-color:${thumbColor};height:${(hoverW || barWDown) ? breadth + 4 : breadth}px;width: ${barWTall}px;transform: translateX(${barWScrollLeft}px)`"></div>
     </div>
     <!-- 默认内容 -->
     <div ref="ohyeahbody"
@@ -29,7 +31,9 @@
   </div>
 </template>
 <script>
-// todo: 各种自定义：颜色,模式(固定小圆球),监听方法兼容性，超大数组测试，外层容器大小改变时监听
+// todo: 各种自定义：颜色V,监听方法兼容性V，外层容器大小改变时监听V,事件（到顶，到底，滚动的值），方法（设置滚动条位置），边缘检测,数量减少时滚动条位置处理
+import ElementResizeDetectorMaker from "element-resize-detector";
+
 export default {
   name: "ohyeah-scroll",
   data() {
@@ -51,17 +55,19 @@ export default {
       scaleH: 1, // 比例尺
       scaleW: 1,
       hoverH: false, // H悬浮
-      hoverW: false // W悬浮
+      hoverW: false, // W悬浮
+      timer: null
     };
   },
   props: {
-    breadth: { type: Number, default: 6 } // bar宽窄
+    breadth: { type: Number, default: 6 }, // bar宽窄
+    trackColor: { type: String, default: "rgba(255, 255, 255, 0.5)" }, // 轨道背景色
+    thumbColor: { type: String, default: "#7f7f7f" } // 滑块背景色
   },
   mounted() {
     console.log("slot", this.$slots, this.$refs);
     // 监听内部宽高变化，用于调整滚动条大小和位置
-    this.observer = new ResizeObserver(this.callback);
-    this.observer.observe(this.$refs.ohyeahbody);
+    this.listenResize();
     // 监听鼠标拖动事件
     document.addEventListener("mousemove", this.onBarDragMove);
     document.addEventListener("mouseup", this.onMouseUp);
@@ -70,12 +76,31 @@ export default {
   beforeDestroy() {
     // 卸载鼠标拖动事件
     document.removeEventListener("mousemove", this.onBarDragMove);
-    this.observer.disconnect();
+    if (window.ResizeObserver) {
+      this.observer.disconnect();
+    } else {
+      this.observer.uninstall();
+    }
     this.observer = null;
   },
 
   computed: {},
   methods: {
+    // 监听容器变化
+    listenResize() {
+      // 如果支持ResizeObserver就用这个
+      if (window.ResizeObserver) {
+        this.observer = new ResizeObserver(this.callback);
+        this.observer.observe(this.$refs.ohyeahbody);
+        this.observer.observe(this.$refs.ohyeahbox);
+      } else {
+        this.observer = ElementResizeDetectorMaker({
+          strategy: "scroll"
+        });
+        this.observer.listenTo(this.$refs.ohyeahbody, this.callback);
+        this.observer.listenTo(this.$refs.ohyeahbox, this.callback);
+      }
+    },
     callback(msg) {
       const a = this.$refs.ohyeahbox.getBoundingClientRect(); // 外壳大小
       const b = this.$refs.ohyeahbody.getBoundingClientRect(); // body大小
@@ -168,19 +193,26 @@ export default {
       e.preventDefault();
       e.stopPropagation();
       e.stopImmediatePropagation();
-      const a = this.$refs.ohyeahbox.getBoundingClientRect(); // 外壳大小
-      if (this.isShowH) {
-        this.barHScrollTop = Math.min(
-          Math.max(this.barHScrollTop - e.wheelDeltaY / 10, 0),
-          a.height - this.barHTall - 4
-        );
+      // 节流
+      if (this.timer) {
+        return;
       }
-      if (this.isShowW) {
-        this.barWScrollLeft = Math.min(
-          Math.max(this.barWScrollLeft - e.wheelDeltaX / 10, 0),
-          a.width - this.barWTall - 4
-        );
-      }
+      this.timer = setTimeout(() => {
+        const a = this.$refs.ohyeahbox.getBoundingClientRect(); // 外壳大小
+        if (this.isShowH) {
+          this.barHScrollTop = Math.min(
+            Math.max(this.barHScrollTop + e.deltaY / 5, 0),
+            a.height - this.barHTall - 4
+          );
+        }
+        if (this.isShowW) {
+          this.barWScrollLeft = Math.min(
+            Math.max(this.barWScrollLeft + e.deltaX / 5, 0),
+            a.width - this.barWTall - 4
+          );
+        }
+        this.timer = null;
+      });
     }
   }
 };
@@ -213,14 +245,11 @@ export default {
     z-index: 10;
     cursor: pointer;
     opacity: 0;
-
-    background-color: rgba(255, 255, 255, 0.5);
     transition: opacity 200ms, width 200ms;
     &.show {
       opacity: 1;
     }
     & > div {
-      background-color: #7f7f7f;
       border-radius: 999px;
       transition: height 200ms, width 200ms;
     }
@@ -235,13 +264,11 @@ export default {
     z-index: 9;
     cursor: pointer;
     opacity: 0;
-    background-color: rgba(255, 255, 255, 0.5);
     transition: opacity 200ms, width 200ms;
     &.show {
       opacity: 1;
     }
     & > div {
-      background-color: #7f7f7f;
       border-radius: 999px;
       transition: height 200ms, width 200ms;
     }
