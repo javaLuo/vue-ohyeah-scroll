@@ -7,18 +7,18 @@
          @mousedown.stop="onTrackMousedown($event,1)"
          @mouseenter.stop="hoverH = true"
          @mouseleave.stop="hoverH = false"
-         :style="`background-color:${trackColor};`"
+         :style="`background-color:${trackColor};opacity:${autoHide? 0 : 0.8}`"
          :class="['ohyeah-scroll-vertical-track-h',{'disabled': !isShowH},{'show': barHDown }]">
       <div @mousedown.stop="onBarMousedown($event, 1)"
            ref="ohyeahbarh"
-           :style="`transition:transform ${transSpeed}ms;background-color:${thumbColor};width:${(hoverH || barHDown )? breadth + 4 : breadth}px;height: ${barHTall}px;transform: translateY(${barHScrollTop}px);border-radius:${breadth}px`"></div>
+           :style="`transition:transform ${transSpeed}ms,width 250ms;background-color:${thumbColor};width:${(hoverH || barHDown )? breadth + 4 : breadth}px;height: ${barHTall}px;transform: translateY(${barHScrollTop}px);border-radius:${breadth}px`"></div>
     </div>
     <!-- 横向滚动条 -->
     <div v-if="!noHor"
          @mousedown.stop="onTrackMousedown($event,2)"
          @mouseenter.stop="hoverW = true"
          @mouseleave.stop="hoverW = false"
-         :style="`background-color:${trackColor}`"
+         :style="`background-color:${trackColor};opacity:${autoHide? 0 : 0.8}`"
          :class="['ohyeah-scroll-vertical-track-w',{'disabled': !isShowW},{'show': barWDown }]">
       <div @mousedown.stop="onBarMousedown($event,2)"
            ref="ohyeahbarw"
@@ -27,7 +27,7 @@
     <!-- 默认内容 -->
     <div ref="ohyeahbody"
          class="ohyeah-scroll-body"
-         :style="`transition:transform ${transSpeed}ms;transform:translate(-${barWScrollLeft * scaleW}px, -${barHScrollTop * scaleH}px)`">
+         :style="`transition:transform ${transSpeed}ms,width 250ms;transform:translate(-${barWScrollLeft * scaleW}px, -${barHScrollTop * scaleH}px)`">
       <slot></slot>
     </div>
   </div>
@@ -61,7 +61,7 @@ export default {
       hoverH: false, // H悬浮
       hoverW: false, // W悬浮
       timer: null,
-      transSpeed: 0 // 过渡的速度
+      transSpeed: 250 // 过渡的速度
     };
   },
   props: {
@@ -69,7 +69,8 @@ export default {
     noHor: { type: Boolean, default: false }, // 是否禁用横向滚动条
     breadth: { type: Number, default: 6 }, // bar宽窄
     trackColor: { type: String, default: "rgba(255, 255, 255, 0.5)" }, // 轨道背景色
-    thumbColor: { type: String, default: "#7f7f7f" } // 滑块背景色
+    thumbColor: { type: String, default: "#7f7f7f" }, // 滑块背景色
+    autoHide: { type: String, default: true } // 是否自动隐藏滚动条
   },
   mounted() {
     // 监听内部宽高变化，用于调整滚动条大小和位置
@@ -331,7 +332,7 @@ export default {
   }
 };
 </script>
-<style lang="less">
+<style lang="scss">
 .ohyeah-scroll-box {
   position: relative;
   overflow: hidden;
@@ -340,7 +341,7 @@ export default {
   &:hover {
     .ohyeah-scroll-vertical-track-h,
     .ohyeah-scroll-vertical-track-w {
-      opacity: 1;
+      opacity: 1 !important;
     }
   }
   &.transition {
@@ -367,14 +368,12 @@ export default {
     top: 0;
     z-index: 10;
     cursor: pointer;
-    opacity: 0.8;
     transition: opacity 200ms, width 200ms;
     &.show {
-      opacity: 1;
+      opacity: 1 !important;
     }
     & > div {
       border-radius: 999px;
-      transition: width 200ms;
     }
   }
   .ohyeah-scroll-vertical-track-w {
@@ -386,14 +385,12 @@ export default {
     left: 0;
     z-index: 9;
     cursor: pointer;
-    opacity: 0.8;
     transition: opacity 200ms, height 200ms;
     &.show {
-      opacity: 1;
+      opacity: 1 !important;
     }
     & > div {
       border-radius: 999px;
-      transition: height 200ms;
     }
   }
   .ohyeah-scroll-body {
