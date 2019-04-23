@@ -1,8 +1,8 @@
 {
-  "name": "vue-ohyeah",
-  "description": "A Vue.js project",
-  "version": "1.0.0",
-  "author": "L <376693576@qq.com>",
+  "name": "vue-ohyeah-scroll",
+  "description": "prettier scroll",
+  "version": "0.0.3",
+  "author": "L <https://blog.isluo.com>",
   "license": "MIT",
   "private": false,
   "main": "dist/ohyeah-scroll.js",

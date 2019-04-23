@@ -4,18 +4,19 @@
     <p>a</p>
     <div ref="box"
          class="demo-div">
-      <ohyeah-scroll ref="scroll1"
-                     no-hor
-                     :no-ver="noV"
-                     @onVerStart="onVerStart"
-                     @onVerEnd="onVerEnd"
-                     @onScroll="onScroll"
-                     trackColor="transparent">
+      <OhyeahScroll ref="scroll1"
+                    :no-hor="noV"
+                    @onVerStart="onVerStart"
+                    @onVerEnd="onVerEnd"
+                    @onScroll="onScroll"
+                    trackColor="transparent">
         <ul>
           <li v-for="(item,index) in arr"
+              :style="`width:${width}px`"
               :key="index">{{`${item}-${index}`}}</li>
         </ul>
-      </ohyeah-scroll>
+        <div>333</div>
+      </OhyeahScroll>
     </div>
     <div class="demo-div2">
       <div v-for="(item,index) in arr"
@@ -32,25 +33,38 @@
 </template>
 
 <script>
+import { OhyeahScroll } from "../dist/ohyeah-scroll";
+
 export default {
   name: "app",
   data() {
     return {
       msg: "Welcome to Your Vue.js App",
       arr: new Array(20).fill("a"),
-      noV: false
+      noV: false,
+      width: 200
     };
   },
-  mounted() {},
+  components: {
+    OhyeahScroll
+  },
+  mounted() {
+    // console.log("什么情况：", OhyeahScroll);
+  },
   methods: {
     add() {
       this.arr.push(this.arr.length + 1);
+      this.width = this.width + 100;
     },
     plus() {
       this.arr.splice(-1, 1);
+      this.width = this.width - 100;
     },
     changeBox() {
-      this.$refs.box.style.height = Math.random() * 200 + 300 + "px";
+      console.log("change?");
+      // this.$refs.box.style.height = Math.random() * 200 + 300 + "px";
+      // this.$refs.box.style.width = Math.random() * 200 + 300 + "px";
+      this.$refs.box.style.height = 25 + "px";
     },
     onVerStart(obj) {
       console.log("到顶了：", obj);
@@ -62,7 +76,7 @@ export default {
       console.log("正在滚动：", obj);
     },
     onScrollTo() {
-      this.$refs.scroll1.scrollTo("end", "end", 0);
+      this.$refs.scroll1.scrollTo("end", "end", 300);
     }
   }
 };

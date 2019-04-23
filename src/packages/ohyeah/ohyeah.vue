@@ -8,7 +8,7 @@
          @mouseenter.stop="hoverH = true"
          @mouseleave.stop="hoverH = false"
          :style="`background-color:${trackColor};opacity:${autoHide? 0 : 0.8}`"
-         :class="['ohyeah-scroll-vertical-track-h',{'disabled': !isShowH},{'show': barHDown }]">
+         :class="['ohyeah-scroll-vertical-track-h',{'disabled': !isShowH},{'show': barHDown },{'left': left}]">
       <div @mousedown.stop="onBarMousedown($event, 1)"
            ref="ohyeahbarh"
            :style="`transition:transform ${transSpeed}ms,width 250ms;background-color:${thumbColor};width:${(hoverH || barHDown )? breadth + 4 : breadth}px;height: ${barHTall}px;transform: translateY(${barHScrollTop}px);border-radius:${breadth}px`"></div>
@@ -19,10 +19,10 @@
          @mouseenter.stop="hoverW = true"
          @mouseleave.stop="hoverW = false"
          :style="`background-color:${trackColor};opacity:${autoHide? 0 : 0.8}`"
-         :class="['ohyeah-scroll-vertical-track-w',{'disabled': !isShowW},{'show': barWDown }]">
+         :class="['ohyeah-scroll-vertical-track-w',{'disabled': !isShowW},{'show': barWDown },{'top': top}]">
       <div @mousedown.stop="onBarMousedown($event,2)"
            ref="ohyeahbarw"
-           :style="`transition:transform ${transSpeed}ms;background-color:${thumbColor};height:${(hoverW || barWDown) ? breadth + 4 : breadth}px;width: ${barWTall}px;transform: translateX(${barWScrollLeft}px)`"></div>
+           :style="`transition:transform ${transSpeed}ms,height 250ms;background-color:${thumbColor};height:${(hoverW || barWDown) ? breadth + 4 : breadth}px;width: ${barWTall}px;transform: translateX(${barWScrollLeft}px)`"></div>
     </div>
     <!-- 默认内容 -->
     <div ref="ohyeahbody"
@@ -67,10 +67,13 @@ export default {
   props: {
     noVer: { type: Boolean, default: false }, // 是否禁用垂直滚动条
     noHor: { type: Boolean, default: false }, // 是否禁用横向滚动条
+    left: { type: Boolean, default: false }, // 垂直滚动条是否依附于容器左边
+    top: { type: Boolean, default: false }, // 横向滚动条是否依附于容器顶部
     breadth: { type: Number, default: 6 }, // bar宽窄
     trackColor: { type: String, default: "rgba(255, 255, 255, 0.5)" }, // 轨道背景色
     thumbColor: { type: String, default: "#7f7f7f" }, // 滑块背景色
-    autoHide: { type: String, default: true } // 是否自动隐藏滚动条
+    autoHide: { type: Boolean, default: true }, // 是否自动隐藏滚动条
+    minLength: { type: Number, default: 20 } // 滑块最小长度
   },
   mounted() {
     // 监听内部宽高变化，用于调整滚动条大小和位置
@@ -79,7 +82,6 @@ export default {
     // 监听鼠标拖动事件
     document.addEventListener("mousemove", this.onBarDragMove);
     document.addEventListener("mouseup", this.onMouseUp);
-    this.$refs.ohyeahbarh.add;
   },
   beforeDestroy() {
     // 卸载鼠标拖动事件
@@ -182,7 +184,10 @@ export default {
 
       if (this.realShowH) {
         const temp = this.barHScrollTop * this.scaleH;
-        this.barHTall = Math.max((a.height / b.height) * this.trickH, 20);
+        this.barHTall = Math.max(
+          (a.height / b.height) * this.trickH,
+          this.minLength > a.height ? 0 : this.minLength
+        );
         this.scaleH = (b.height - a.height) / (this.trickH - this.barHTall);
         this.barHScrollTop = Math.min(
           Math.max(temp / this.scaleH, 0),
@@ -194,7 +199,10 @@ export default {
       }
       if (this.realShowW) {
         const temp = this.barWScrollLeft * this.scaleW;
-        this.barWTall = Math.max((a.width / b.width) * this.trickW, 20);
+        this.barWTall = Math.max(
+          (a.width / b.width) * this.trickW,
+          this.minLength > a.width ? 0 : this.minLength
+        );
         this.scaleW = (b.width - a.width) / (this.trickW - this.barWTall);
         this.barWScrollLeft = Math.min(
           Math.max(temp / this.scaleW, 0),
@@ -361,7 +369,6 @@ export default {
   .ohyeah-scroll-vertical-track-h {
     position: absolute;
     box-sizing: border-box;
-    // width: auto;
     height: 100%;
     padding: 2px;
     right: 0;
@@ -371,6 +378,10 @@ export default {
     transition: opacity 200ms, width 200ms;
     &.show {
       opacity: 1 !important;
+    }
+    &.left {
+      left: 0;
+      right: auto;
     }
     & > div {
       border-radius: 999px;
@@ -388,6 +399,10 @@ export default {
     transition: opacity 200ms, height 200ms;
     &.show {
       opacity: 1 !important;
+    }
+    &.top {
+      top: 0;
+      bottom: auto;
     }
     & > div {
       border-radius: 999px;
