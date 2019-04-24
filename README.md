@@ -1,6 +1,6 @@
 # vue-ohyeah-scroll
 
-[![npm](https://img.shields.io/npm/v/vue-ohyeah-scroll.svg)](https://www.npmjs.com/package/vue-ohyeah-scroll) ![NPM](https://img.shields.io/npm/l/vue-ohyeah-scroll.svg?style=popout) ![GitHub last commit](https://img.shields.io/github/last-commit/javaLuo/vue-ohyeah-scroll.svg?style=popout)
+[![npm](https://img.shields.io/npm/v/vue-ohyeah-scroll.svg)](https://www.npmjs.com/package/vue-ohyeah-scroll) ![NPM](https://img.shields.io/npm/l/vue-ohyeah-scroll.svg?style=popout) ![GitHub last commit](https://img.shields.io/github/last-commit/javaLuo/vue-ohyeah-scroll.svg?style=popout) [![npm downloads](https://img.shields.io/npm/dt/vue-ohyeah-scroll.svg)](https://www.npmjs.com/package/vue-ohyeah-scroll)
 
 仿 MAC 系统的滚动条
 
@@ -18,8 +18,9 @@
 - [x] 动态手动设置滚动条的 scrollTop 和 scrollLeft
 - [x] 支持一键滚动到底部
 - [x] 内容随意增减，父级容器随便改变大小
+- [x] 支持嵌套
 
-### DEMO
+### 效果预览
 
 <a href="https://isluo.com/work/vue-ohyeah-scroll" target="_blank" rel="nofollow me noopener noreferrer">https://isluo.com/work/vue-ohyeah-scroll</a>
 
