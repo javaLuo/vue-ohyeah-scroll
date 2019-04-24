@@ -171,8 +171,8 @@ export default {
 
 ```js
   <template>
-    <!-- 需要一个具有定位的 且 具有高度或宽度 的容器来包裹ohyeah -->
-    <div style="position:relative; height:100vh; width:50%;">
+    <!-- 需要一个具有高度和宽度的容器来包裹ohyeah -->
+    <div style="height:100vh; width:50%;">
       <ohyeah>
         <div v-for="(item,index) in testData">{{index}}</div>
       </ohyeah>
@@ -196,6 +196,5 @@ export default {
 
 ### 注意事项
 
-- 需要一个非 static 定位的容器包裹 ohyeah-scroll，并且容器应该具有高度或宽度
-- 你也可以直接把 src/package/ohyeah.vue 拷贝出来用，这样有利于减小一点体积，毕竟我把 CSS 和其他东西都打包到一个 js 里了。
-- 直接使用的话，需要自己安装`element-resize-detector`,这个用于检测容器大小变化
+- 需要一个具有高度和宽度的容器来包裹ohyeah
+
