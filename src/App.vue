@@ -9,6 +9,8 @@
                     :autoHide="false"
                     @onVerStart="onVerStart"
                     @onVerEnd="onVerEnd"
+                    @onHorStart="onHorStart"
+                    @onHorEnd="onHorEnd"
                     @onScroll="onScroll"
                     trackColor="transparent">
         <ul>
@@ -74,10 +76,16 @@ export default {
       console.log("到底了：", obj);
     },
     onScroll(obj) {
-      console.log("正在滚动：", obj);
+      //console.log("正在滚动：", obj);
     },
     onScrollTo() {
       this.$refs.scroll1.scrollTo("end", "end", 300);
+    },
+    onHorStart(obj) {
+      console.log("到左了：", obj);
+    },
+    onHorEnd(obj) {
+      console.log("到右了：", obj);
     }
   }
 };

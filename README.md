@@ -1,16 +1,19 @@
 # vue-ohyeah-scroll
 
-仿MAC系统的滚动条，MAC系统上的滚动条我觉得是最舒服的
+[![npm](https://img.shields.io/npm/v/vue-ohyeah-scroll.svg)](https://www.npmjs.com/package/vue-ohyeah-scroll) ![NPM](https://img.shields.io/npm/l/vue-ohyeah-scroll.svg?style=popout) ![GitHub last commit](https://img.shields.io/github/last-commit/javaLuo/vue-ohyeah-scroll.svg?style=popout)
 
-> 不支持移动端，移动端不需要美化，iphone本来就很棒，Android可以用-webkit-scrollbar来调整
+仿 MAC 系统的滚动条，MAC 系统上的滚动条我觉得是最舒服的
+
+> 不支持移动端，移动端不需要美化，iphone 本来就很棒，Android 可以用-webkit-scrollbar 来调整
 
 ### 特性
-* [x] 默认是MAC系统的主题，也可以自定义轨道和滑块颜色
-* [x] 可以设置滚动条显示在左边或上面
-* [x] 自动显隐滚动条
-* [x] 动态手动设置滚动条的scrollTop和scrollLeft
-* [x] 支持一键滚动到底部
-* [x] 内容随意增减，父级容器随便改变大小
+
+- [x] 默认是 MAC 系统的主题，也可以自定义轨道和滑块颜色
+- [x] 可以设置滚动条显示在左边或上面
+- [x] 自动显隐滚动条
+- [x] 动态手动设置滚动条的 scrollTop 和 scrollLeft
+- [x] 支持一键滚动到底部
+- [x] 内容随意增减，父级容器随便改变大小
 
 ### DEMO
 
@@ -25,29 +28,30 @@
 ### 使用
 
 全局注册
+
 ```js
-  import OhyeahScroll from './packages/ohyeah';
-  Vue.use(OhyeahScroll);
+import OhyeahScroll from './packages/ohyeah';
+Vue.use(OhyeahScroll);
 ```
 
 局部注册
-```js
-  import { OhyeahScroll } from './packages/ohyeah';
 
-  export default {
-    components:{
-      OhyeahScroll
-    }
-  }
+```js
+import { OhyeahScroll } from './packages/ohyeah';
+
+export default {
+  components: {
+    OhyeahScroll,
+  },
+};
 ```
 
 组件中使用
+
 ```js
-  <template>
-    <ohyeah-scroll>
-      ...
-    </ohyeah-scroll>
-  </template>
+<template>
+  <ohyeah-scroll>...</ohyeah-scroll>
+</template>
 ```
 
 ### 自定义属性
@@ -55,15 +59,14 @@
 | 属性名     | 类型    | 默认值      | 描述                                     |
 | ---------- | ------- | ----------- | ---------------------------------------- |
 | breadth    | Number  | 6           | 滑块的粗细                               |
-| thumbColor | String  | #7f7f7f     | 滑块的颜色，接受CSS颜色值                |
-| trackColor | String  | transparent | 轨道的颜色，接受CSS颜色值                |
+| thumbColor | String  | #7f7f7f     | 滑块的颜色，接受 CSS 颜色值              |
+| trackColor | String  | transparent | 轨道的颜色，接受 CSS 颜色值              |
 | autoHide   | Boolean | true        | 是否自动隐藏滚动条，鼠标在区域内才显示   |
 | left       | Boolean | false       | 是否把垂直滚动条放在容器的左边           |
 | top        | Boolean | false       | 是否把水平滚动条放在容器的顶端           |
 | noVer      | Boolean | false       | 是否禁用垂直滚动条(overflow-y:hidden)    |
 | noHor      | Boolean | false       | 是否禁用水平滚动条(overflow-x:hidden)    |
 | minLength  | Number  | 20          | 当内容无限多的时候，滑块最短不得低于此值 |
-
 
 ### 自定义事件
 
@@ -117,11 +120,13 @@
 
 ### 自身方法
 
-| 方法名   | 参数       | 描述                     |
-| -------- | ---------- | ------------------------ |
-| scrollTo | (x,y,time) | 将滚动条滚动到指定的位置 |
+| 方法名        | 参数       | 描述                     |
+| ------------- | ---------- | ------------------------ |
+| scrollTo      | (x,y,time) | 将滚动条滚动到指定的位置 |
+| getScrollInfo | 无         | 获取当前滚动条各种信息   |
 
 用法：
+
 ```js
   <template>
     <!-- 需要定义一个ref -->
@@ -140,13 +145,53 @@
         scrollToEnd(){
           // 水平滚到最左边，垂直滚到底，瞬间完成
           this.$refs.ohyeah.scrollTo(0, 'end', 0);
+        },
+        getScrollInfo(){
+          // 获取当前滚动条各种信息
+          const msg = this.$refs.ohyeah.getScrollInfo();
+          /**
+           * offsetHeight: 内容区的总高度,
+           * offsetWidth: 内容区的总宽度,
+           * height: 容器的高度,
+           * width: 容器的宽度,
+           * scrollTop: 内容区已被滚到上边去的距离,
+           * scrollLeft: 内容区已被滚到左边去的距离
+           * */
         }
       }
     }
   </script>
 ```
 
-### that's it
+### 完整例子
 
-- 你也可以直接把src/package/ohyeah.vue拷贝出来用，这样有利于减小一点体积，毕竟我把CSS和其他东西都打包到一个js里了。
-- 直接使用的话，需要自己安装```element-resize-detector```,这个用于检测容器大小变化
+```js
+  <template>
+    <!-- 需要一个具有定位的 且 具有高度或宽度 的容器来包裹ohyeah-scroll -->
+    <div style="position:relative; height:100vh; width:50%;">
+      <ohyeah-scroll>
+        <div v-for="(item,index) in testData">{{index}}</div>
+      </ohyeah-scroll>
+    </div>
+  </template>
+
+  <script>
+    import { OhyeahScroll } from "vue-ohyeah-scroll";
+    export default {
+      data(){
+        return {
+          testData: new Array(100).fill("")
+        }
+      }
+      components:{
+        OhyeahScroll
+      }
+    }
+  </script>
+```
+
+### 注意事项
+
+- 需要一个非 static 定位的容器包裹 ohyeah-scroll，并且容器应该具有高度或宽度
+- 你也可以直接把 src/package/ohyeah.vue 拷贝出来用，这样有利于减小一点体积，毕竟我把 CSS 和其他东西都打包到一个 js 里了。
+- 直接使用的话，需要自己安装`element-resize-detector`,这个用于检测容器大小变化
