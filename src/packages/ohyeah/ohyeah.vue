@@ -1,5 +1,6 @@
 <template>
-  <div ref="ohyeahbox"
+  <div v-if="!isMobile"
+       ref="ohyeahbox"
        class="ohyeah-scroll-box"
        @wheel.capture.stop="onMouseWheel">
     <!-- 纵向滚动条 -->
@@ -31,6 +32,10 @@
       <slot></slot>
     </div>
   </div>
+  <div class="ohyeah-scroll-box mobile"
+       v-else>
+    <slot></slot>
+  </div>
 </template>
 <script>
 import ElementResizeDetectorMaker from "element-resize-detector";
@@ -39,6 +44,9 @@ export default {
   name: "ohyeah-scroll",
   data() {
     return {
+      isMobile: /(android)|(iphone)|(symbianos)|(windows phone)|(ipad)|(ipod)/.test(
+        navigator.userAgent.toLowerCase()
+      ),
       observer: null, // 监听变化
       isShowH: false, // 是否显示垂直滚动条
       isShowW: false, // 是否显示横向滚动条,
@@ -77,6 +85,9 @@ export default {
   },
   mounted() {
     // 监听内部宽高变化，用于调整滚动条大小和位置
+    if (this.isMobile) {
+      return;
+    }
     this.callback();
     this.listenResize();
     // 监听鼠标拖动事件
@@ -85,6 +96,9 @@ export default {
   },
   beforeDestroy() {
     // 卸载鼠标拖动事件
+    if (this.isMobile) {
+      return;
+    }
     document.removeEventListener("mousemove", this.onBarDragMove);
     if (window.ResizeObserver) {
       this.observer.disconnect();
@@ -356,6 +370,9 @@ export default {
   overflow: hidden;
   width: 100%;
   height: 100%;
+  &.mobile {
+    overflow: auto;
+  }
   &:hover {
     .ohyeah-scroll-vertical-track-h,
     .ohyeah-scroll-vertical-track-w {

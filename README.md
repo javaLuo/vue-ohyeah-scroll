@@ -2,9 +2,13 @@
 
 [![npm](https://img.shields.io/npm/v/vue-ohyeah-scroll.svg)](https://www.npmjs.com/package/vue-ohyeah-scroll) ![NPM](https://img.shields.io/npm/l/vue-ohyeah-scroll.svg?style=popout) ![GitHub last commit](https://img.shields.io/github/last-commit/javaLuo/vue-ohyeah-scroll.svg?style=popout)
 
-仿 MAC 系统的滚动条，MAC 系统上的滚动条我觉得是最舒服的
+仿 MAC 系统的滚动条
 
-> 不支持移动端，移动端不需要美化，iphone 本来就很棒，Android 可以用-webkit-scrollbar 来调整
+> 主要在 PC 端使用，如果检测到是移动端，会直接使用原生滚动条，ohyeah-scroll 不会进行初始化
+
+| Chrome | Firefox | Safari | Opera | Edge | IE                |
+| ------ | ------- | ------ | ----- | ---- | ----------------- |
+| √      | √       | √      | √     | √    | `10` √<br/>`11` √ |
 
 ### 特性
 
