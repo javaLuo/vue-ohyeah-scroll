@@ -2,7 +2,7 @@
   <div v-if="!isMobile"
        ref="ohyeahbox"
        class="ohyeah-scroll-box"
-       @wheel.capture.stop="onMouseWheel">
+       @wheel="onMouseWheel">
     <!-- 纵向滚动条 -->
     <div v-if="!noVer"
          @mousedown.stop="onTrackMousedown($event,1)"
@@ -28,7 +28,7 @@
     <!-- 默认内容 -->
     <div ref="ohyeahbody"
          class="ohyeah-scroll-body"
-         :style="`transition:transform ${transSpeed}ms,width 250ms;transform:translate(-${barWScrollLeft * scaleW}px, -${barHScrollTop * scaleH}px)`">
+         :style="`transition:transform ${transSpeed}ms,width 250ms;transform:translate(-${barWScrollLeft * scaleW}px, -${barHScrollTop * scaleH}px) translateZ(0)`">
       <slot></slot>
     </div>
   </div>
@@ -41,7 +41,7 @@
 import ElementResizeDetectorMaker from "element-resize-detector";
 
 export default {
-  name: "ohyeah-scroll",
+  name: "ohyeah",
   data() {
     return {
       isMobile: /(android)|(iphone)|(symbianos)|(windows phone)|(ipad)|(ipod)/.test(
@@ -187,7 +187,6 @@ export default {
     callback() {
       const a = this.$refs.ohyeahbox.getBoundingClientRect(); // 外壳大小
       const b = this.$refs.ohyeahbody.getBoundingClientRect(); // body大小
-
       this.bodyH = b.height;
       this.bodyW = b.width;
       this.trickH = a.height - 4; // 轨道长度 = box高度 - padding的4px
@@ -302,6 +301,7 @@ export default {
       e.preventDefault();
       e.stopPropagation();
       e.stopImmediatePropagation();
+
       // 节流
       if (this.timer) {
         return;
@@ -374,17 +374,17 @@ export default {
     overflow: auto;
   }
   &:hover {
-    .ohyeah-scroll-vertical-track-h,
-    .ohyeah-scroll-vertical-track-w {
+    & > .ohyeah-scroll-vertical-track-h,
+    & > .ohyeah-scroll-vertical-track-w {
       opacity: 1 !important;
     }
   }
   &.transition {
-    .ohyeah-scroll-body {
+    & > .ohyeah-scroll-body {
       transition: transform 250ms;
     }
-    .ohyeah-scroll-vertical-track-h > div,
-    .ohyeah-scroll-vertical-track-w > div {
+    & > .ohyeah-scroll-vertical-track-h > div,
+    & > .ohyeah-scroll-vertical-track-w > div {
       transition: transform 250ms;
     }
   }

@@ -9,7 +9,7 @@ module.exports = {
     path: path.resolve(__dirname, './dist'),
     publicPath: '/dist/',
     filename: NODE_ENV == 'development' ? 'build.js' : 'ohyeah-scroll.js',
-    library: 'ohyeah-scroll',
+    library: 'ohyeah',
     libraryTarget: 'umd',
     umdNamedDefine: true,
   },

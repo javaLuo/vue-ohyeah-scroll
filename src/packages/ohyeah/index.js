@@ -1,5 +1,5 @@
-import OhyeahScroll from './ohyeah';
+import Ohyeah from './ohyeah';
 
-OhyeahScroll.install = Vue => Vue.component(OhyeahScroll.name, OhyeahScroll);
+Ohyeah.install = Vue => Vue.component(Ohyeah.name, Ohyeah);
 
-export default OhyeahScroll;
+export default Ohyeah;

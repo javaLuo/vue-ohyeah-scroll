@@ -1,55 +1,72 @@
 <template>
-  <div id="app">
-    <p>a</p>
-    <p>a</p>
-    <div ref="box"
-         class="demo-div">
-      <OhyeahScroll ref="scroll1"
-                    :no-hor="noV"
-                    :autoHide="false"
-                    @onVerStart="onVerStart"
-                    @onVerEnd="onVerEnd"
-                    @onHorStart="onHorStart"
-                    @onHorEnd="onHorEnd"
-                    @onScroll="onScroll"
-                    trackColor="transparent">
-        <ul>
-          <li v-for="(item,index) in arr"
-              :style="`width:${width}px`"
-              :key="index">{{`${item}-${index}`}}</li>
-        </ul>
-        <div>333</div>
-      </OhyeahScroll>
-    </div>
-    <div class="demo-div2">
-      <div v-for="(item,index) in arr"
-           :key="index">
-        {{`${item}-${index}`}}
+  <div class="app-box"
+       id="app">
+    <ohyeah>
+      <p>a</p>
+      <p>a</p>
+      <p>a</p>
+      <p>a</p>
+      <div ref="box"
+           class="demo-div">
+        <ohyeah ref="scroll1"
+                :no-hor="noV"
+                @onVerStart="onVerStart"
+                @onVerEnd="onVerEnd"
+                @onHorStart="onHorStart"
+                @onHorEnd="onHorEnd"
+                @onScroll="onScroll"
+                trackColor="transparent">
+          <ul>
+            <li v-for="(item,index) in arr"
+                @wheel.stop
+                :style="`width:${width}px`"
+                :key="index">
+              <p>{{`${item}-${index}`}}</p>
+            </li>
+          </ul>
+        </ohyeah>
       </div>
-    </div>
-    <button @click="add">add</button>
-    <button @click="plus">plus</button>
-    <button @click="noV = !noV">noV</button>
-    <button @click="changeBox">changeBox</button>
-    <button @click="onScrollTo">onScrollTo</button>
+      <div class="demo-div2">
+        <div v-for="(item,index) in arr"
+             :key="index">
+          {{`${item}-${index}`}}
+        </div>
+      </div>
+      <button @click="add">add</button>
+      <button @click="plus">plus</button>
+      <button @click="noV = !noV">noV</button>
+      <button @click="changeBox">changeBox</button>
+      <button @click="onScrollTo">onScrollTo</button>
+      <p>a</p>
+      <p>a</p>
+      <p>a</p>
+      <p>a</p>
+      <p>a</p>
+      <p>a</p>
+      <p>a</p>
+      <p>a</p>
+      <p>a</p>
+      <p>a</p>
+      <p>a</p>
+      <p>a</p>
+    </ohyeah>
   </div>
 </template>
 
 <script>
-import OhyeahScroll from "./packages/ohyeah";
-
+import Ohyeah from "./packages/ohyeah";
 export default {
   name: "app",
   data() {
     return {
       msg: "Welcome to Your Vue.js App",
-      arr: new Array(20).fill("a"),
+      arr: new Array(100).fill("a"),
       noV: false,
       width: 200
     };
   },
   components: {
-    OhyeahScroll
+    Ohyeah
   },
   mounted() {
     // console.log("什么情况：", OhyeahScroll);
@@ -96,6 +113,10 @@ body {
   margin: 0;
   background-color: #f0f0f0;
 }
+.app-box {
+  position: relative;
+  height: 100vh;
+}
 .demo-div {
   width: 300px;
   height: 500px;
@@ -110,14 +131,34 @@ body {
     margin: 0;
     padding: 0;
     height: 100px;
+    overflow: auto;
     width: 800px;
     border: solid 1px #ccc;
     box-sizing: border-box;
+    p {
+      display: block;
+      height: 600px;
+    }
   }
 }
 .demo-div2 {
   position: absolute;
   left: 350px;
+  top: 50px;
+  width: 300px;
+  height: 500px;
+  border: solid 1px #ccc;
+  overflow: scroll;
+  & > div {
+    height: 100px;
+    width: 800px;
+    border: solid 1px #ccc;
+    box-sizing: border-box;
+  }
+}
+.demo-div3 {
+  position: absolute;
+  left: 770px;
   top: 50px;
   width: 300px;
   height: 500px;

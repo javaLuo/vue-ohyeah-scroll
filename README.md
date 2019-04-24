@@ -34,18 +34,18 @@
 全局注册
 
 ```js
-import OhyeahScroll from './packages/ohyeah';
-Vue.use(OhyeahScroll);
+import Ohyeah from 'vue-ohyeah-scroll';
+Vue.use(Ohyeah);
 ```
 
 局部注册
 
 ```js
-import { OhyeahScroll } from './packages/ohyeah';
+import { Ohyeah } from 'vue-ohyeah-scroll';
 
 export default {
   components: {
-    OhyeahScroll,
+    Ohyeah,
   },
 };
 ```
@@ -54,7 +54,7 @@ export default {
 
 ```js
 <template>
-  <ohyeah-scroll>...</ohyeah-scroll>
+  <ohyeah>...</ohyeah>
 </template>
 ```
 
@@ -171,16 +171,16 @@ export default {
 
 ```js
   <template>
-    <!-- 需要一个具有定位的 且 具有高度或宽度 的容器来包裹ohyeah-scroll -->
+    <!-- 需要一个具有定位的 且 具有高度或宽度 的容器来包裹ohyeah -->
     <div style="position:relative; height:100vh; width:50%;">
-      <ohyeah-scroll>
+      <ohyeah>
         <div v-for="(item,index) in testData">{{index}}</div>
-      </ohyeah-scroll>
+      </ohyeah>
     </div>
   </template>
 
   <script>
-    import { OhyeahScroll } from "vue-ohyeah-scroll";
+    import { Ohyeah } from "vue-ohyeah-scroll";
     export default {
       data(){
         return {
@@ -188,7 +188,7 @@ export default {
         }
       }
       components:{
-        OhyeahScroll
+        Ohyeah
       }
     }
   </script>

@@ -1,6 +1,6 @@
-import OhyeahScroll from './packages/ohyeah';
+import Ohyeah from './packages/ohyeah';
 
-const components = [OhyeahScroll];
+const components = [Ohyeah];
 const install = function(Vue, opts = {}) {
   components.map(component => {
     Vue.component(component.name, component);
@@ -15,4 +15,4 @@ export default {
   install,
 };
 
-export { OhyeahScroll };
+export { Ohyeah };
