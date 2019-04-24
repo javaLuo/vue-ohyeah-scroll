@@ -6,6 +6,7 @@
          class="demo-div">
       <OhyeahScroll ref="scroll1"
                     :no-hor="noV"
+                    :autoHide="false"
                     @onVerStart="onVerStart"
                     @onVerEnd="onVerEnd"
                     @onScroll="onScroll"
@@ -33,7 +34,7 @@
 </template>
 
 <script>
-import { OhyeahScroll } from "../dist/ohyeah-scroll";
+import OhyeahScroll from "./packages/ohyeah";
 
 export default {
   name: "app",

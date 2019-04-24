@@ -52,17 +52,17 @@
 
 ### 自定义属性
 
-| 属性名     | 类型    | 默认值                   | 描述                                     |
-| ---------- | ------- | ------------------------ | ---------------------------------------- |
-| breadth    | Number  | 6                        | 滑块的粗细                               |
-| thumbColor | String  | #7f7f7f                  | 滑块的颜色，接受CSS颜色值                |
-| trackColor | String  | rgba(255, 255, 255, 0.5) | 轨道的颜色，接受CSS颜色值                |
-| autoHide   | Boolean | true                     | 是否自动隐藏滚动条，鼠标在区域内才显示   |
-| left       | Boolean | false                    | 是否把垂直滚动条放在容器的左边           |
-| top        | Boolean | false                    | 是否把水平滚动条放在容器的顶端           |
-| noVer      | Boolean | false                    | 是否禁用垂直滚动条(overflow-y:hidden)    |
-| noHor      | Boolean | false                    | 是否禁用水平滚动条(overflow-x:hidden)    |
-| minLength  | Number  | 20                       | 当内容无限多的时候，滑块最短不得低于此值 |
+| 属性名     | 类型    | 默认值      | 描述                                     |
+| ---------- | ------- | ----------- | ---------------------------------------- |
+| breadth    | Number  | 6           | 滑块的粗细                               |
+| thumbColor | String  | #7f7f7f     | 滑块的颜色，接受CSS颜色值                |
+| trackColor | String  | transparent | 轨道的颜色，接受CSS颜色值                |
+| autoHide   | Boolean | true        | 是否自动隐藏滚动条，鼠标在区域内才显示   |
+| left       | Boolean | false       | 是否把垂直滚动条放在容器的左边           |
+| top        | Boolean | false       | 是否把水平滚动条放在容器的顶端           |
+| noVer      | Boolean | false       | 是否禁用垂直滚动条(overflow-y:hidden)    |
+| noHor      | Boolean | false       | 是否禁用水平滚动条(overflow-x:hidden)    |
+| minLength  | Number  | 20          | 当内容无限多的时候，滑块最短不得低于此值 |
 
 
 ### 自定义事件

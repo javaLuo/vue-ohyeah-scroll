@@ -11,7 +11,7 @@
          :class="['ohyeah-scroll-vertical-track-h',{'disabled': !isShowH},{'show': barHDown },{'left': left}]">
       <div @mousedown.stop="onBarMousedown($event, 1)"
            ref="ohyeahbarh"
-           :style="`transition:transform ${transSpeed}ms,width 250ms;background-color:${thumbColor};width:${(hoverH || barHDown )? breadth + 4 : breadth}px;height: ${barHTall}px;transform: translateY(${barHScrollTop}px);border-radius:${breadth}px`"></div>
+           :style="`transition:transform ${transSpeed}ms,width 250ms,height 250ms;background-color:${thumbColor};width:${(hoverH || barHDown )? breadth + 4 : breadth}px;height: ${barHTall}px;transform: translateY(${barHScrollTop}px);border-radius:${breadth}px`"></div>
     </div>
     <!-- 横向滚动条 -->
     <div v-if="!noHor"
@@ -22,7 +22,7 @@
          :class="['ohyeah-scroll-vertical-track-w',{'disabled': !isShowW},{'show': barWDown },{'top': top}]">
       <div @mousedown.stop="onBarMousedown($event,2)"
            ref="ohyeahbarw"
-           :style="`transition:transform ${transSpeed}ms,height 250ms;background-color:${thumbColor};height:${(hoverW || barWDown) ? breadth + 4 : breadth}px;width: ${barWTall}px;transform: translateX(${barWScrollLeft}px)`"></div>
+           :style="`transition:transform ${transSpeed}ms,height 250ms,width 250ms;background-color:${thumbColor};height:${(hoverW || barWDown) ? breadth + 4 : breadth}px;width: ${barWTall}px;transform: translateX(${barWScrollLeft}px)`"></div>
     </div>
     <!-- 默认内容 -->
     <div ref="ohyeahbody"
@@ -70,7 +70,7 @@ export default {
     left: { type: Boolean, default: false }, // 垂直滚动条是否依附于容器左边
     top: { type: Boolean, default: false }, // 横向滚动条是否依附于容器顶部
     breadth: { type: Number, default: 6 }, // bar宽窄
-    trackColor: { type: String, default: "rgba(255, 255, 255, 0.5)" }, // 轨道背景色
+    trackColor: { type: String, default: "transparent" }, // 轨道背景色
     thumbColor: { type: String, default: "#7f7f7f" }, // 滑块背景色
     autoHide: { type: Boolean, default: true }, // 是否自动隐藏滚动条
     minLength: { type: Number, default: 20 } // 滑块最小长度
@@ -148,7 +148,7 @@ export default {
       };
       if (newV <= 0) {
         this.$emit("onHorStart", p);
-      } else if (newV >= this.trickH - this.barHTall) {
+      } else if (newV >= this.trickW - this.barWTall) {
         this.$emit("onHorEnd", p);
       }
       this.$emit("onScroll", p);
@@ -336,6 +336,16 @@ export default {
           this.trickW - this.barWTall
         );
       }
+    },
+    getScrollInfo() {
+      return {
+        offsetHeight: this.bodyH,
+        offsetWidth: this.bodyW,
+        height: this.trickH + 4,
+        width: this.trickW + 4,
+        scrollTop: this.barHScrollTop * this.scaleH,
+        scrollLeft: this.barWScrollLeft * this.scaleW
+      };
     }
   }
 };
