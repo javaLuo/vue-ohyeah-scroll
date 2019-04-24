@@ -112,7 +112,7 @@ export default {
     </tr>
     <tr>
       <td>onHorEnd</td>
-      <td>每次水平滚动条抵达最左边时将触发一次</td>
+      <td>每次水平滚动条抵达最右边时将触发一次</td>
       <td>同上</td>
     </tr>
     <tr>
