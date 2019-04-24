@@ -174,7 +174,10 @@ export default {
   <template>
     <!-- 需要一个具有高度和宽度的容器来包裹ohyeah -->
     <div style="height:100vh; width:50%;">
-      <ohyeah>
+      <ohyeah
+        :autoHide="false"
+        @onVerStart="console.log('到顶了')"
+      >
         <div v-for="(item,index) in testData">{{index}}</div>
       </ohyeah>
     </div>
