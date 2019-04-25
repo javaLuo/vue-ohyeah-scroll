@@ -69,7 +69,12 @@ export default {
       hoverH: false, // H悬浮
       hoverW: false, // W悬浮
       timer: null,
-      transSpeed: 250 // 过渡的速度
+      transSpeed: 250, // 过渡的速度
+      slow:
+        navigator.userAgent.indexOf("Firefox") >= 0 &&
+        navigator.userAgent.indexOf("Windows") >= 0
+          ? 1
+          : 5 // 减缓滚轮的速度，太快了,windows版本的火狐特殊处理
     };
   },
   props: {
@@ -310,13 +315,13 @@ export default {
         this.transSpeed = 0;
         if (this.realShowH) {
           this.barHScrollTop = Math.min(
-            Math.max(this.barHScrollTop + e.deltaY / 5, 0),
+            Math.max(this.barHScrollTop + e.deltaY / this.slow, 0),
             this.trickH - this.barHTall
           );
         }
         if (this.realShowW) {
           this.barWScrollLeft = Math.min(
-            Math.max(this.barWScrollLeft + e.deltaX / 5, 0),
+            Math.max(this.barWScrollLeft + e.deltaX / this.slow, 0),
             this.trickW - this.barWTall
           );
         }
@@ -372,6 +377,7 @@ export default {
   height: 100%;
   &.mobile {
     overflow: auto;
+    touch-action: manipulation;
   }
   &:hover {
     & > .ohyeah-scroll-vertical-track-h,

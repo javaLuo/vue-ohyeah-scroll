@@ -18,10 +18,10 @@
                 trackColor="transparent">
           <ul>
             <li v-for="(item,index) in arr"
-                @wheel.stop
                 :style="`width:${width}px`"
                 :key="index">
-              <p>{{`${item}-${index}`}}</p>
+              abc
+              <!-- <p>{{`${item}-${index}`}}</p> -->
             </li>
           </ul>
         </ohyeah>
@@ -131,7 +131,6 @@ body {
     margin: 0;
     padding: 0;
     height: 100px;
-    overflow: auto;
     width: 800px;
     border: solid 1px #ccc;
     box-sizing: border-box;
