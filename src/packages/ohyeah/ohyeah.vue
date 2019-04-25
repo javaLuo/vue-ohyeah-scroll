@@ -377,7 +377,7 @@ export default {
   height: 100%;
   &.mobile {
     overflow: auto;
-    touch-action: manipulation;
+    -webkit-overflow-scrolling: touch;
   }
   &:hover {
     & > .ohyeah-scroll-vertical-track-h,
