@@ -8,7 +8,7 @@
       <p>a</p>
       <ohyeah ref="scroll1"
               :no-hor="noV"
-              width="30vw"
+              width="300px"
               height="400px"
               :autoHide="false"
               @onVerStart="onVerStart"
@@ -54,6 +54,7 @@
 
 <script>
 import Ohyeah from "./packages/ohyeah";
+// import { Ohyeah } from "../dist/ohyeah-scroll";
 export default {
   name: "app",
   data() {

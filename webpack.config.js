@@ -1,9 +1,11 @@
-var path = require('path');
-var webpack = require('webpack');
-
+const path = require('path');
+const webpack = require('webpack');
+const TerserPlugin = require("terser-webpack-plugin"); // 优化js
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const NODE_ENV = process.env.NODE_ENV;
 
 module.exports = {
+  mode: NODE_ENV,
   entry: NODE_ENV == 'development' ? './src/main.js' : './src/index.js',
   output: {
     path: path.resolve(__dirname, './dist'),
@@ -12,6 +14,18 @@ module.exports = {
     library: 'ohyeah',
     libraryTarget: 'umd',
     umdNamedDefine: true,
+  },
+  optimization: {
+    minimizer: [
+      new TerserPlugin({
+        parallel: true, // 多线程并行构建
+        terserOptions: {
+          output: {
+            comments: false // 不保留注释
+          }
+        }
+      })
+    ]
   },
   module: {
     rules: [
@@ -32,13 +46,9 @@ module.exports = {
         loader: 'vue-loader',
         options: {
           loaders: {
-            // Since sass-loader (weirdly) has SCSS as its default parse mode, we map
-            // the "scss" and "sass" values for the lang attribute to the right configs here.
-            // other preprocessors should work out of the box, no loader config like this necessary.
             scss: ['vue-style-loader', 'css-loader', 'sass-loader'],
             sass: ['vue-style-loader', 'css-loader', 'sass-loader?indentedSyntax'],
           },
-          // other vue-loader options go here
         },
       },
       {
@@ -55,6 +65,9 @@ module.exports = {
       },
     ],
   },
+  plugins:[
+    new VueLoaderPlugin()
+  ],
   resolve: {
     alias: {
       vue$: 'vue/dist/vue.esm.js',
@@ -70,6 +83,7 @@ module.exports = {
     hints: false,
   },
   devtool: '#eval-source-map',
+
 };
 
 if (process.env.NODE_ENV === 'production') {
@@ -80,15 +94,6 @@ if (process.env.NODE_ENV === 'production') {
       'process.env': {
         NODE_ENV: '"production"',
       },
-    }),
-    new webpack.optimize.UglifyJsPlugin({
-      sourceMap: true,
-      compress: {
-        warnings: false,
-      },
-    }),
-    new webpack.LoaderOptionsPlugin({
-      minimize: true,
     }),
   ]);
 }

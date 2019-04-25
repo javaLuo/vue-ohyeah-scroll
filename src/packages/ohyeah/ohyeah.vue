@@ -74,8 +74,8 @@ export default {
       slow:
         navigator.userAgent.indexOf("Firefox") >= 0 &&
         navigator.userAgent.indexOf("Windows") >= 0
-          ? 1
-          : 5 // 减缓滚轮的速度，太快了,windows版本的火狐特殊处理
+          ? 8
+          : 0.2 // 减缓滚轮的速度，太快了,windows版本的火狐特殊处理
     };
   },
   props: {
@@ -324,13 +324,13 @@ export default {
         this.transSpeed = 0;
         if (this.realShowH) {
           this.barHScrollTop = Math.min(
-            Math.max(this.barHScrollTop + e.deltaY / this.slow, 0),
+            Math.max(e.deltaY * this.slow + this.barHScrollTop, 0),
             this.trickH - this.barHTall
           );
         }
         if (this.realShowW) {
           this.barWScrollLeft = Math.min(
-            Math.max(this.barWScrollLeft + e.deltaX / this.slow, 0),
+            Math.max( e.deltaX * this.slow + this.barWScrollLeft, 0),
             this.trickW - this.barWTall
           );
         }
