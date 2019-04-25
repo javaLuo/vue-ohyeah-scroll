@@ -1,6 +1,7 @@
 <template>
   <div v-if="!isMobile"
        ref="ohyeahbox"
+       :style="`width:${theWidth};height:${theHeight}`"
        class="ohyeah-scroll-box"
        @wheel="onMouseWheel">
     <!-- 纵向滚动条 -->
@@ -86,7 +87,9 @@ export default {
     trackColor: { type: String, default: "transparent" }, // 轨道背景色
     thumbColor: { type: String, default: "#7f7f7f" }, // 滑块背景色
     autoHide: { type: Boolean, default: true }, // 是否自动隐藏滚动条
-    minLength: { type: Number, default: 20 } // 滑块最小长度
+    minLength: { type: Number, default: 20 }, // 滑块最小长度
+    width: { type: [Number, String], default: "100%" }, // ohyeah容器宽度
+    height: { type: [Number, String], default: "100%" } // ohyeah容器高度
   },
   mounted() {
     // 监听内部宽高变化，用于调整滚动条大小和位置
@@ -119,6 +122,12 @@ export default {
     },
     realShowW() {
       return this.isShowW && !this.noHor;
+    },
+    theWidth() {
+      return Number(this.width) ? `${this.width}px` : this.width;
+    },
+    theHeight() {
+      return Number(this.height) ? `${this.height}px` : this.height;
     }
   },
   watch: {
@@ -373,8 +382,6 @@ export default {
 .ohyeah-scroll-box {
   position: relative;
   overflow: hidden;
-  width: 100%;
-  height: 100%;
   &.mobile {
     overflow: auto;
     -webkit-overflow-scrolling: touch;

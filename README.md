@@ -55,23 +55,27 @@ export default {
 
 ```js
 <template>
-  <ohyeah>...</ohyeah>
+  <ohyeah width="100vw" height="100vh">
+    ...
+  </ohyeah>
 </template>
 ```
 
 ### 自定义属性
 
-| 属性名     | 类型    | 默认值      | 描述                                     |
-| ---------- | ------- | ----------- | ---------------------------------------- |
-| breadth    | Number  | 6           | 滑块的粗细                               |
-| thumbColor | String  | #7f7f7f     | 滑块的颜色，接受 CSS 颜色值              |
-| trackColor | String  | transparent | 轨道的颜色，接受 CSS 颜色值              |
-| autoHide   | Boolean | true        | 是否自动隐藏滚动条，鼠标在区域内才显示   |
-| left       | Boolean | false       | 是否把垂直滚动条放在容器的左边           |
-| top        | Boolean | false       | 是否把水平滚动条放在容器的顶端           |
-| noVer      | Boolean | false       | 是否禁用垂直滚动条(overflow-y:hidden)    |
-| noHor      | Boolean | false       | 是否禁用水平滚动条(overflow-x:hidden)    |
-| minLength  | Number  | 20          | 当内容无限多的时候，滑块最短不得低于此值 |
+| 属性名     | 类型          | 默认值      | 描述                                                                                    |
+| ---------- | ------------- | ----------- | --------------------------------------------------------------------------------------- |
+| width      | Number,String | 100%        | 容器宽度，默认贴合父级(父级需要有宽度)，也可自己设置，接受合法的CSS值，传数字会转换成px |
+| height     | Number,String | 100%        | 容器高度，默认贴合父级(父级需要有高度)，也可自己设置，接受合法的CSS值，传数字会转换成px |
+| breadth    | Number        | 6           | 滑块的粗细，单位: px                                                                    |
+| thumbColor | String        | #7f7f7f     | 滑块的颜色，接受 CSS 颜色值                                                             |
+| trackColor | String        | transparent | 轨道的颜色，接受 CSS 颜色值                                                             |
+| autoHide   | Boolean       | true        | 是否自动隐藏滚动条，鼠标在区域内才显示                                                  |
+| left       | Boolean       | false       | 是否把垂直滚动条放在容器的左边                                                          |
+| top        | Boolean       | false       | 是否把水平滚动条放在容器的顶端                                                          |
+| noVer      | Boolean       | false       | 是否禁用垂直滚动条(overflow-y:hidden)                                                   |
+| noHor      | Boolean       | false       | 是否禁用水平滚动条(overflow-x:hidden)                                                   |
+| minLength  | Number        | 20          | 当内容无限多的时候，滑块最短不得低于此值，单位: px                                      |
 
 ### 自定义事件
 
@@ -130,14 +134,15 @@ export default {
 | scrollTo      | (x,y,time) | 将滚动条滚动到指定的位置 |
 | getScrollInfo | 无         | 获取当前滚动条各种信息   |
 
-用法：
+
+如何使用自身方法：
 
 ```js
   <template>
     <!-- 需要定义一个ref -->
-    <ohyeah-scroll ref="ohyeah">
+    <ohyeah ref="ohyeah">
       ...
-    </ohyeah-scroll>
+    </ohyeah>
   </template>
 
   <script>
@@ -172,13 +177,13 @@ export default {
 
 ```js
   <template>
-    <!-- 需要一个具有高度和宽度的容器来包裹ohyeah -->
+    <!-- 若不设置ohyeah的width和height, 则需要一个具有高度和宽度的容器来包裹ohyeah -->
     <div style="height:100vh; width:50%;">
       <ohyeah
         :autoHide="false"
         @onVerStart="console.log('到顶了')"
       >
-        <div v-for="(item,index) in testData">{{index}}</div>
+        <div v-for="(item,index) in testData" :key="index">{{index}}</div>
       </ohyeah>
     </div>
   </template>
@@ -200,5 +205,6 @@ export default {
 
 ### 注意事项
 
-- 需要一个具有高度和宽度的容器来包裹ohyeah
+- 如果你不设置ohyeah的width和height属性，或者设置为百分比，
+- 那么就需要一个具有高度和宽度的父级元素来包裹ohyeah
 
