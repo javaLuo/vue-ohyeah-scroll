@@ -74,8 +74,8 @@ export default {
       slow:
         navigator.userAgent.indexOf("Firefox") >= 0 &&
         navigator.userAgent.indexOf("Windows") >= 0
-          ? 1
-          : 5 // 减缓滚轮的速度，太快了,windows版本的火狐特殊处理
+          ? 8
+          : 0.2 // 减缓滚轮的速度，太快了,windows版本的火狐特殊处理
     };
   },
   props: {
