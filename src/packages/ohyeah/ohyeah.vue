@@ -108,6 +108,7 @@ export default {
       return;
     }
     document.removeEventListener("mousemove", this.onBarDragMove);
+    document.removeEventListener("mouseup", this.onMouseUp);
     if (window.ResizeObserver) {
       this.observer.disconnect();
     } else {
