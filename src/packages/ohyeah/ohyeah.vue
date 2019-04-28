@@ -69,8 +69,8 @@ export default {
       scaleW: 0,
       hoverH: false, // H悬浮
       hoverW: false, // W悬浮
-      timer: null,
       transSpeed: 250, // 过渡的速度
+      timer: 0,
       slow:
         navigator.userAgent.indexOf("Firefox") >= 0 &&
         navigator.userAgent.indexOf("Windows") >= 0
@@ -293,17 +293,29 @@ export default {
     onBarDragMove(e) {
       // 正在拖拽纵向滚动条
       if (this.barHDown) {
-        this.transSpeed = 0;
-        this.barHScrollTop = Math.min(
-          Math.max(this.startBarHScrollTop + e.clientY - this.startY, 0),
-          this.trickH - this.barHTall
-        );
+        if (!this.timer) {
+          requestAnimationFrame(() => {
+            this.transSpeed = 0;
+            this.barHScrollTop = Math.min(
+              Math.max(this.startBarHScrollTop + e.clientY - this.startY, 0),
+              this.trickH - this.barHTall
+            );
+            this.timer = 0;
+          });
+          this.timer = 1;
+        }
       } else if (this.barWDown) {
-        this.transSpeed = 0;
-        this.barWScrollLeft = Math.min(
-          Math.max(this.startBarWScrollLeft + e.clientX - this.startX, 0),
-          this.trickW - this.barWTall
-        );
+        if (!this.timer) {
+          requestAnimationFrame(() => {
+            this.transSpeed = 0;
+            this.barWScrollLeft = Math.min(
+              Math.max(this.startBarWScrollLeft + e.clientX - this.startX, 0),
+              this.trickW - this.barWTall
+            );
+            this.timer = 0;
+          });
+          this.timer = 1;
+        }
       }
     },
     // 鼠标抬起
@@ -317,26 +329,27 @@ export default {
       e.stopImmediatePropagation();
 
       // 节流
-      if (this.timer) {
-        return;
+      if (!this.timer) {
+        requestAnimationFrame(() => {
+          this.transSpeed = 0;
+          if (this.realShowH) {
+            this.barHScrollTop = Math.min(
+              Math.max(this.barHScrollTop + e.deltaY / this.slow, 0),
+              this.trickH - this.barHTall
+            );
+          }
+          if (this.realShowW) {
+            this.barWScrollLeft = Math.min(
+              Math.max(this.barWScrollLeft + e.deltaX / this.slow, 0),
+              this.trickW - this.barWTall
+            );
+          }
+          this.timer = 0;
+        });
+        this.timer = 1;
       }
-      this.timer = setTimeout(() => {
-        this.transSpeed = 0;
-        if (this.realShowH) {
-          this.barHScrollTop = Math.min(
-            Math.max(this.barHScrollTop + e.deltaY / this.slow, 0),
-            this.trickH - this.barHTall
-          );
-        }
-        if (this.realShowW) {
-          this.barWScrollLeft = Math.min(
-            Math.max(this.barWScrollLeft + e.deltaX / this.slow, 0),
-            this.trickW - this.barWTall
-          );
-        }
-        this.timer = null;
-      });
     },
+
     scrollTo(x = 0, y = 0, time = 0) {
       const s_y =
         y === "end"
