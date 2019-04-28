@@ -334,13 +334,13 @@ export default {
           this.transSpeed = 0;
           if (this.realShowH) {
             this.barHScrollTop = Math.min(
-              Math.max(this.barHScrollTop + e.deltaY / this.slow, 0),
+              Math.max(e.deltaY * this.slow + this.barHScrollTop, 0),
               this.trickH - this.barHTall
             );
           }
           if (this.realShowW) {
             this.barWScrollLeft = Math.min(
-              Math.max(this.barWScrollLeft + e.deltaX / this.slow, 0),
+              Math.max(e.deltaX * this.slow + this.barWScrollLeft, 0),
               this.trickW - this.barWTall
             );
           }
