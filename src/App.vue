@@ -6,25 +6,25 @@
       <p>a</p>
       <p>a</p>
       <p>a</p>
-      <ohyeah ref="scroll1"
-              :no-hor="noV"
-              width="300px"
-              height="400px"
-              :autoHide="false"
-              @onVerStart="onVerStart"
-              @onVerEnd="onVerEnd"
-              @onHorStart="onHorStart"
-              @onHorEnd="onHorEnd"
-              @onScroll="onScroll"
-              trackColor="transparent">
-        <ul>
-          <li v-for="(item,index) in arr"
-              :style="`width:${width}px`"
-              :key="index">
-            <p>{{`${item}-${index}`}}</p>
-          </li>
-        </ul>
-      </ohyeah>
+      <div style="width:300px;height:500px;">
+        <ohyeah ref="scroll1"
+                :no-hor="noV"
+                :autoHide="false"
+                @onVerStart="onVerStart"
+                @onVerEnd="onVerEnd"
+                @onHorStart="onHorStart"
+                @onHorEnd="onHorEnd"
+                @onScroll="onScroll"
+                trackColor="transparent">
+          <ul>
+            <li v-for="(item,index) in arr"
+                :style="`width:${width}px`"
+                :key="index">
+              <p>{{`${item}-${index}`}}</p>
+            </li>
+          </ul>
+        </ohyeah>
+      </div>
       <div class="demo-div2">
         <div v-for="(item,index) in arr"
              :key="index">
@@ -115,7 +115,10 @@ body {
 }
 .app-box {
   position: relative;
-  height: 100vh;
+  height: 500px;
+  width: 800px;
+  border: solid 1px #ccc;
+  padding: 20px;
 }
 .demo-div {
   width: 300px;

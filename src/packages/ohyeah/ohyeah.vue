@@ -244,7 +244,6 @@ export default {
     // 滚动条上鼠标按下 1纵 2横
     onBarMousedown(e, type) {
       e.preventDefault();
-      e.stopPropagation();
       e.stopImmediatePropagation();
 
       this.barHDown = type === 1;
@@ -257,7 +256,6 @@ export default {
     // 轨道上鼠标按下
     onTrackMousedown(e, type) {
       e.preventDefault();
-      e.stopPropagation();
       e.stopImmediatePropagation();
       this.barHDown = type === 1;
       this.barWDown = type === 2;
@@ -325,29 +323,58 @@ export default {
     },
     //鼠标滚轮事件
     onMouseWheel(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-
       // 节流
       if (!this.timer) {
+        let y =
+          this.realShowH && e.deltaY
+            ? Math.min(
+                Math.max(e.deltaY * this.slow + this.barHScrollTop, 0),
+                this.trickH - this.barHTall
+              )
+            : 0;
+        let x =
+          this.realShowW && e.deltaX
+            ? Math.min(
+                Math.max(e.deltaX * this.slow + this.barWScrollLeft, 0),
+                this.trickW - this.barWTall
+              )
+            : 0;
+
+        this.willStopProp(e, y, x);
+
         requestAnimationFrame(() => {
           this.transSpeed = 0;
-          if (this.realShowH) {
-            this.barHScrollTop = Math.min(
-              Math.max(e.deltaY * this.slow + this.barHScrollTop, 0),
-              this.trickH - this.barHTall
-            );
+          if (this.realShowH && e.deltaY) {
+            this.barHScrollTop = y;
           }
-          if (this.realShowW) {
-            this.barWScrollLeft = Math.min(
-              Math.max(e.deltaX * this.slow + this.barWScrollLeft, 0),
-              this.trickW - this.barWTall
-            );
+          if (this.realShowW && e.deltaX) {
+            this.barWScrollLeft = x;
           }
           this.timer = 0;
         });
         this.timer = 1;
+      } else {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
+    },
+
+    willStopProp(e) {
+      if (
+        e.deltaY &&
+        this.barHScrollTop + e.deltaY > 0 &&
+        this.barHScrollTop + e.deltaY < this.trickH - this.barHTall
+      ) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
+      if (
+        e.deltaX &&
+        this.barWScrollLeft + e.deltaX > 0 &&
+        this.barWScrollLeft + e.deltaX < this.trickW - this.barWTall
+      ) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
       }
     },
 
