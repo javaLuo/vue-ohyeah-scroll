@@ -361,6 +361,7 @@ export default {
 
     willStopProp(e) {
       if (
+        this.realShowH &&
         e.deltaY &&
         this.barHScrollTop + e.deltaY > 0 &&
         this.barHScrollTop + e.deltaY < this.trickH - this.barHTall
@@ -369,6 +370,7 @@ export default {
         e.stopImmediatePropagation();
       }
       if (
+        this.realShowW &&
         e.deltaX &&
         this.barWScrollLeft + e.deltaX > 0 &&
         this.barWScrollLeft + e.deltaX < this.trickW - this.barWTall

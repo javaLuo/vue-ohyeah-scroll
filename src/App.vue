@@ -78,7 +78,7 @@ export default {
     },
     plus() {
       this.arr.splice(-1, 1);
-      this.width = this.width - 100;
+      //this.width = this.width - 100;
     },
     changeBox() {
       console.log("change?");
