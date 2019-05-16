@@ -29,7 +29,7 @@
     <!-- 默认内容 -->
     <div ref="ohyeahbody"
          class="ohyeah-scroll-body"
-         :style="`transition:transform ${transSpeed}ms,width 250ms;transform:translate(-${barWScrollLeft * scaleW}px, -${barHScrollTop * scaleH}px) translateZ(0)`">
+         :style="`${noVer ? 'height:100%;' : ''} ${noHor ? 'width:100%;' : ''} transition:transform ${transSpeed}ms,width 250ms;transform:translate(-${barWScrollLeft * scaleW}px, -${barHScrollTop * scaleH}px) translateZ(0)`">
       <slot></slot>
     </div>
   </div>
