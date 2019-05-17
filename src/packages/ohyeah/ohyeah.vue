@@ -13,7 +13,7 @@
          :class="['ohyeah-scroll-vertical-track-h',{'disabled': !isShowH},{'show': barHDown },{'left': left}]">
       <div @mousedown.stop="onBarMousedown($event, 1)"
            ref="ohyeahbarh"
-           :style="`transition:transform ${transSpeed}ms,width 250ms,height 250ms;background-color:${thumbColor};width:${(hoverH || barHDown )? breadth + 4 : breadth}px;height: ${barHTall}px;transform: translateY(${barHScrollTop}px);border-radius:${breadth}px`"></div>
+           :style="`transition:transform ${transSpeed}ms,width 250ms,height 250ms;background-color:${thumbColor};width:${(hoverH || barHDown )? breadth + 4 : breadth}px;height: ${barHTall}px;transform: translateY(${barHScrollTop}px);border-radius:${breadth}px`" />
     </div>
     <!-- 横向滚动条 -->
     <div v-if="!noHor"
@@ -24,7 +24,7 @@
          :class="['ohyeah-scroll-vertical-track-w',{'disabled': !isShowW},{'show': barWDown },{'top': top}]">
       <div @mousedown.stop="onBarMousedown($event,2)"
            ref="ohyeahbarw"
-           :style="`transition:transform ${transSpeed}ms,height 250ms,width 250ms;background-color:${thumbColor};height:${(hoverW || barWDown) ? breadth + 4 : breadth}px;width: ${barWTall}px;transform: translateX(${barWScrollLeft}px)`"></div>
+           :style="`transition:transform ${transSpeed}ms,height 250ms,width 250ms;background-color:${thumbColor};height:${(hoverW || barWDown) ? breadth + 4 : breadth}px;width: ${barWTall}px;transform: translateX(${barWScrollLeft}px)`" />
     </div>
     <!-- 默认内容 -->
     <div ref="ohyeahbody"
@@ -40,14 +40,11 @@
 </template>
 <script>
 import ElementResizeDetectorMaker from "element-resize-detector";
-
 export default {
   name: "ohyeah",
   data() {
     return {
-      isMobile: /(android)|(iphone)|(symbianos)|(windows phone)|(ipad)|(ipod)/.test(
-        navigator.userAgent.toLowerCase()
-      ),
+      isMobile: false,
       observer: null, // 监听变化
       isShowH: false, // 是否显示垂直滚动条
       isShowW: false, // 是否显示横向滚动条,
@@ -71,11 +68,7 @@ export default {
       hoverW: false, // W悬浮
       transSpeed: 250, // 过渡的速度
       timer: 0,
-      slow:
-        navigator.userAgent.indexOf("Firefox") >= 0 &&
-        navigator.userAgent.indexOf("Windows") >= 0
-          ? 8
-          : 0.2 // 减缓滚轮的速度，太快了,windows版本的火狐特殊处理
+      slow: 0.22
     };
   },
   props: {
@@ -89,10 +82,19 @@ export default {
     autoHide: { type: Boolean, default: true }, // 是否自动隐藏滚动条
     minLength: { type: Number, default: 20 }, // 滑块最小长度
     width: { type: [Number, String], default: "100%" }, // ohyeah容器宽度
-    height: { type: [Number, String], default: "100%" } // ohyeah容器高度
+    height: { type: [Number, String], default: "100%" }, // ohyeah容器高度
+    resizeObject: { type: Boolean, default: false } // resize模式，默认scroll
   },
   mounted() {
     // 监听内部宽高变化，用于调整滚动条大小和位置
+    this.isMobile = /(android)|(iphone)|(symbianos)|(windows phone)|(ipad)|(ipod)/.test(
+      navigator.userAgent.toLowerCase()
+    );
+    this.slow =
+      navigator.userAgent.indexOf("Firefox") >= 0 &&
+      navigator.userAgent.indexOf("Windows") >= 0
+        ? 8
+        : 0.22;
     if (this.isMobile) {
       return;
     }
@@ -112,7 +114,8 @@ export default {
     if (window.ResizeObserver) {
       this.observer.disconnect();
     } else {
-      this.observer.uninstall();
+      this.observer.uninstall(this.$refs.ohyeahbody);
+      this.observer.uninstall(this.$refs.ohyeahbox);
     }
     this.observer = null;
   },
@@ -192,9 +195,9 @@ export default {
         this.observer.observe(this.$refs.ohyeahbody);
         this.observer.observe(this.$refs.ohyeahbox);
       } else {
-        this.observer = ElementResizeDetectorMaker({
-          strategy: "scroll"
-        });
+        this.observer = ElementResizeDetectorMaker(
+          this.resizeObject ? null : { strategy: "scroll" }
+        );
         this.observer.listenTo(this.$refs.ohyeahbody, this.callback);
         this.observer.listenTo(this.$refs.ohyeahbox, this.callback);
       }
