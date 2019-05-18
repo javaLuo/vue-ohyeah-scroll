@@ -63,19 +63,20 @@ export default {
 
 ### 自定义属性
 
-| 属性名     | 类型          | 默认值      | 描述                                                                                    |
-| ---------- | ------------- | ----------- | --------------------------------------------------------------------------------------- |
-| width      | Number,String | 100%        | 容器宽度，默认贴合父级(父级需要有宽度)，也可自己设置，接受合法的CSS值，传数字会转换成px |
-| height     | Number,String | 100%        | 容器高度，默认贴合父级(父级需要有高度)，也可自己设置，接受合法的CSS值，传数字会转换成px |
-| breadth    | Number        | 6           | 滑块的粗细，单位: px                                                                    |
-| thumbColor | String        | #7f7f7f     | 滑块的颜色，接受 CSS 颜色值                                                             |
-| trackColor | String        | transparent | 轨道的颜色，接受 CSS 颜色值                                                             |
-| autoHide   | Boolean       | true        | 是否自动隐藏滚动条，鼠标在区域内才显示                                                  |
-| left       | Boolean       | false       | 是否把垂直滚动条放在容器的左边                                                          |
-| top        | Boolean       | false       | 是否把水平滚动条放在容器的顶端                                                          |
-| noVer      | Boolean       | false       | 是否禁用垂直滚动条(overflow-y:hidden)                                                   |
-| noHor      | Boolean       | false       | 是否禁用水平滚动条(overflow-x:hidden)                                                   |
-| minLength  | Number        | 20          | 当内容无限多的时候，滑块最短不得低于此值，单位: px                                      |
+| 属性名       | 类型          | 默认值      | 描述                                                                                        |
+| ------------ | ------------- | ----------- | ------------------------------------------------------------------------------------------- |
+| width        | Number,String | 100%        | 容器宽度，默认贴合父级(父级需要有宽度)，也可自己设置，接受合法的CSS值，传数字会转换成px     |
+| height       | Number,String | 100%        | 容器高度，默认贴合父级(父级需要有高度)，也可自己设置，接受合法的CSS值，传数字会转换成px     |
+| breadth      | Number        | 6           | 滑块的粗细，单位: px                                                                        |
+| thumbColor   | String        | #7f7f7f     | 滑块的颜色，接受 CSS 颜色值                                                                 |
+| trackColor   | String        | transparent | 轨道的颜色，接受 CSS 颜色值                                                                 |
+| autoHide     | Boolean       | true        | 是否自动隐藏滚动条，鼠标在区域内才显示                                                      |
+| left         | Boolean       | false       | 是否把垂直滚动条放在容器的左边                                                              |
+| top          | Boolean       | false       | 是否把水平滚动条放在容器的顶端                                                              |
+| noVer        | Boolean       | false       | 是否禁用垂直滚动条(overflow-y:hidden)                                                       |
+| noHor        | Boolean       | false       | 是否禁用水平滚动条(overflow-x:hidden)                                                       |
+| minLength    | Number        | 20          | 当内容无限多的时候，滑块最短不得低于此值，单位: px                                          |
+| resizeObject | Boolean       | false       | 如果存在监听不到内容高度变化的情况可以把这个值改为true试试，（nuxt.js打包后发现有这种情况） |
 
 ### 自定义事件
 
@@ -209,6 +210,6 @@ export default {
 - 那么就需要一个具有高度和宽度的父级元素来包裹ohyeah
 
 ### 更新
-
+- 0.2.9 处理了一下nuxt.js中使用的情况。修复了卸载组件时没有正确卸载容器监听的方法
 - 2019/05/09 处理了嵌套滚动条的事件冒泡问题
 > 原生滚动条（子）和ohyeah（父）嵌套时，原生滚动条需要设置@wheel.stop, todo: 目前的方案不完美，待升级
