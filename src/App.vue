@@ -96,7 +96,7 @@ export default {
       //console.log("正在滚动：", obj);
     },
     onScrollTo() {
-      this.$refs.scroll1.scrollTo("end", "end", 300);
+      this.$refs.scroll1.scrollTo("end", null, 300);
     },
     onHorStart(obj) {
       console.log("到左了：", obj);

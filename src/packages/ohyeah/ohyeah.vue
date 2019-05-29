@@ -383,7 +383,7 @@ export default {
       }
     },
 
-    scrollTo(x = 0, y = 0, time = 0) {
+    scrollTo(x, y, time = 0) {
       const s_y =
         y === "end"
           ? this.trickH - this.barHTall
@@ -398,13 +398,13 @@ export default {
           : 0;
 
       this.transSpeed = time;
-      if (this.realShowH) {
+      if (this.realShowH && (y || y === 0)) {
         this.barHScrollTop = Math.min(
           Math.max(s_y, 0),
           this.trickH - this.barHTall
         );
       }
-      if (this.realShowW) {
+      if (this.realShowW && (x || x === 0)) {
         this.barWScrollLeft = Math.min(
           Math.max(s_x, 0),
           this.trickW - this.barWTall

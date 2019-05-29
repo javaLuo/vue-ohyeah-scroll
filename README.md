@@ -150,8 +150,8 @@ export default {
     export default {
       methods:{
         scrollTo(){
-          // 水平滚50个像素，垂直滚100个像素，在300ms内完成
-          this.$refs.ohyeah.scrollTo(50, 100, 300);
+          // 水平保持原位，垂直滚100个像素，在300ms内完成
+          this.$refs.ohyeah.scrollTo(null, 100, 300);
         },
         scrollToEnd(){
           // 水平滚到最左边，垂直滚到底，瞬间完成
@@ -210,6 +210,7 @@ export default {
 - 那么就需要一个具有高度和宽度的父级元素来包裹ohyeah
 
 ### 更新
+- 0.3.0 this.$refs.ohyeah.scrollTo(null, 100); 传递null表示保持原位不动
 - 0.2.9 处理了一下nuxt.js中使用的情况。修复了卸载组件时没有正确卸载容器监听的方法
 - 2019/05/09 处理了嵌套滚动条的事件冒泡问题
 > 原生滚动条（子）和ohyeah（父）嵌套时，原生滚动条需要设置@wheel.stop, todo: 目前的方案不完美，待升级
