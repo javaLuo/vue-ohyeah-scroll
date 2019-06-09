@@ -1,6 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
-const TerserPlugin = require("terser-webpack-plugin"); // 优化js
+const TerserPlugin = require('terser-webpack-plugin'); // 优化js
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const NODE_ENV = process.env.NODE_ENV;
 
@@ -21,11 +21,11 @@ module.exports = {
         parallel: true, // 多线程并行构建
         terserOptions: {
           output: {
-            comments: false // 不保留注释
-          }
-        }
-      })
-    ]
+            comments: false, // 不保留注释
+          },
+        },
+      }),
+    ],
   },
   module: {
     rules: [
@@ -60,14 +60,12 @@ module.exports = {
         test: /\.(png|jpg|gif|svg)$/,
         loader: 'file-loader',
         options: {
-          name: '[name].[ext]?[hash]',
+          name: 'assets/[name].[hash:4].[ext]',
         },
       },
     ],
   },
-  plugins:[
-    new VueLoaderPlugin()
-  ],
+  plugins: [new VueLoaderPlugin()],
   resolve: {
     alias: {
       vue$: 'vue/dist/vue.esm.js',
@@ -83,7 +81,6 @@ module.exports = {
     hints: false,
   },
   devtool: '#eval-source-map',
-
 };
 
 if (process.env.NODE_ENV === 'production') {

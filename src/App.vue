@@ -25,7 +25,8 @@
           </ul>
         </ohyeah>
       </div>
-      <div class="demo-div2">
+      <div class="demo-div2"
+           @wheel.stop>
         <div v-for="(item,index) in arr"
              :key="index">
           {{index}}
