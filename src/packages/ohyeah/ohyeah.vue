@@ -68,9 +68,7 @@ export default {
       hoverW: false, // W悬浮
       transSpeed: 250, // 过渡的速度
       timer: 0,
-      slow: 0.22,
-      isWheeling: false, // 是否正在滚动中
-      isWheelTimer: false
+      slow: 0.22
     };
   },
   props: {
@@ -371,22 +369,16 @@ export default {
         this.barHScrollTop + e.deltaY > 0 &&
         this.barHScrollTop + e.deltaY < this.trickH - this.barHTall
       ) {
-        this.isWheeling = true;
+        e.preventDefault();
+        e.stopImmediatePropagation();
       } else if (
         this.realShowW &&
         e.deltaX &&
         this.barWScrollLeft + e.deltaX > 0 &&
         this.barWScrollLeft + e.deltaX < this.trickW - this.barWTall
       ) {
-        this.isWheeling = true;
-      }
-      if (this.isWheeling) {
         e.preventDefault();
         e.stopImmediatePropagation();
-        clearTimeout(this.isWheelTimer);
-        this.isWheelTimer = setTimeout(() => {
-          this.isWheeling = false;
-        }, 64);
       }
     },
 
