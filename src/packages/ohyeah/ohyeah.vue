@@ -314,10 +314,10 @@ export default {
 
     // 键盘按下
     onKeyDown(e) {
-      //e.preventDefault();
       if (/^(INPUT)|(TEXTAREA)|SELECT/.test(document.activeElement.nodeName)) {
         return;
       }
+      e.preventDefault(); // 需要这个，不然外部原生滚动条也会跟着滚动
       e.stopImmediatePropagation();
       // 只监听4个方向键
       // 已按下
