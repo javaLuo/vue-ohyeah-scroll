@@ -1,8 +1,9 @@
 <template>
   <div v-if="!isMobile"
-       ref="ohyeahbox"
+       :ref="`ohyeahbox-${id}`"
        :style="`width:${theWidth};height:${theHeight}`"
        class="ohyeah-scroll-box"
+       tabindex="9999"
        @wheel="onMouseWheel">
     <!-- 纵向滚动条 -->
     <div v-if="!noVer"
@@ -12,7 +13,7 @@
          :style="`background-color:${trackColor};opacity:${autoHide? 0 : 0.8}`"
          :class="['ohyeah-scroll-vertical-track-h',{'disabled': !isShowH},{'show': barHDown },{'left': left}]">
       <div @mousedown.stop="onBarMousedown($event, 1)"
-           ref="ohyeahbarh"
+           :ref="`ohyeahbarh-${id}`"
            :style="`transition:transform ${transSpeed}ms,width 250ms,height 250ms;background-color:${thumbColor};width:${(hoverH || barHDown )? breadth + 4 : breadth}px;height: ${barHTall}px;transform: translateY(${barHScrollTop}px);border-radius:${breadth}px`" />
     </div>
     <!-- 横向滚动条 -->
@@ -23,11 +24,11 @@
          :style="`background-color:${trackColor};opacity:${autoHide? 0 : 0.8}`"
          :class="['ohyeah-scroll-vertical-track-w',{'disabled': !isShowW},{'show': barWDown },{'top': top}]">
       <div @mousedown.stop="onBarMousedown($event,2)"
-           ref="ohyeahbarw"
+           :ref="`ohyeahbarw-${id}`"
            :style="`transition:transform ${transSpeed}ms,height 250ms,width 250ms;background-color:${thumbColor};height:${(hoverW || barWDown) ? breadth + 4 : breadth}px;width: ${barWTall}px;transform: translateX(${barWScrollLeft}px)`" />
     </div>
     <!-- 默认内容 -->
-    <div ref="ohyeahbody"
+    <div :ref="`ohyeahbody-${id}`"
          class="ohyeah-scroll-body"
          :style="`${noVer ? 'height:100%;' : ''} ${noHor ? 'width:100%;' : ''} transition:transform ${transSpeed}ms,width 250ms;transform:translate(-${barWScrollLeft * scaleW}px, -${barHScrollTop * scaleH}px) translateZ(0)`">
       <slot></slot>
@@ -48,6 +49,7 @@ export default {
       observer: null, // 监听变化
       isShowH: false, // 是否显示垂直滚动条
       isShowW: false, // 是否显示横向滚动条,
+      isKeyDown: 0, // 键盘按下,0未按下/1已按下/2已启动平滑滚动
       bodyH: 0, // body高
       bodyW: 0, // body宽
       trickH: 0, // 轨道高 = box高 - padding的4px
@@ -67,13 +69,17 @@ export default {
       hoverH: false, // H悬浮
       hoverW: false, // W悬浮
       transSpeed: 250, // 过渡的速度
+      smoothTimer: null,
       timer: 0,
       slow: 0.22
     };
   },
   props: {
+    id: { type: [String, Number], default: () => Date.now() + Math.random() },
     noVer: { type: Boolean, default: false }, // 是否禁用垂直滚动条
     noHor: { type: Boolean, default: false }, // 是否禁用横向滚动条
+    useKeybord: { type: Boolean, default: false }, // 是否启用键盘方向键
+    movePx: { type: Number, default: 160 }, // 键盘翻页速度 px
     left: { type: Boolean, default: false }, // 垂直滚动条是否依附于容器左边
     top: { type: Boolean, default: false }, // 横向滚动条是否依附于容器顶部
     breadth: { type: Number, default: 6 }, // bar宽窄
@@ -103,6 +109,23 @@ export default {
     // 监听鼠标拖动事件
     document.addEventListener("mousemove", this.onBarDragMove);
     document.addEventListener("mouseup", this.onMouseUp);
+    if (this.useKeybord) {
+      this.$refs[`ohyeahbox-${this.id}`].addEventListener(
+        "keyup",
+        this.onKeyUp,
+        false
+      );
+      this.$refs[`ohyeahbox-${this.id}`].addEventListener(
+        "keydown",
+        this.onKeyDown,
+        false
+      );
+      this.$refs[`ohyeahbox-${this.id}`].addEventListener(
+        "mouseenter",
+        this.onBoxMouseEnter,
+        false
+      );
+    }
   },
   beforeDestroy() {
     // 卸载鼠标拖动事件
@@ -111,11 +134,29 @@ export default {
     }
     document.removeEventListener("mousemove", this.onBarDragMove);
     document.removeEventListener("mouseup", this.onMouseUp);
+
+    if (this.useKeybord) {
+      this.$refs[`ohyeahbox-${this.id}`].removeEventListener(
+        "keyup",
+        this.onKeyUp,
+        false
+      );
+      this.$refs[`ohyeahbox-${this.id}`].addEventListener(
+        "keydown",
+        this.onKeyDown,
+        false
+      );
+      this.$refs[`ohyeahbox-${this.id}`].removeEventListener(
+        "mouseenter",
+        this.onBoxMouseEnter,
+        false
+      );
+    }
     if (window.ResizeObserver) {
       this.observer.disconnect();
     } else {
-      this.observer.uninstall(this.$refs.ohyeahbody);
-      this.observer.uninstall(this.$refs.ohyeahbox);
+      this.observer.uninstall(this.$refs[`ohyeahbody-${this.id}`]);
+      this.observer.uninstall(this.$refs[`ohyeahbox-${this.id}`]);
     }
     this.observer = null;
   },
@@ -192,19 +233,25 @@ export default {
       // 如果支持ResizeObserver就用这个
       if (window.ResizeObserver) {
         this.observer = new ResizeObserver(this.callback);
-        this.observer.observe(this.$refs.ohyeahbody);
-        this.observer.observe(this.$refs.ohyeahbox);
+        this.observer.observe(this.$refs[`ohyeahbody-${this.id}`]);
+        this.observer.observe(this.$refs[`ohyeahbox-${this.id}`]);
       } else {
         this.observer = ElementResizeDetectorMaker(
           this.resizeObject ? null : { strategy: "scroll" }
         );
-        this.observer.listenTo(this.$refs.ohyeahbody, this.callback);
-        this.observer.listenTo(this.$refs.ohyeahbox, this.callback);
+        this.observer.listenTo(
+          this.$refs[`ohyeahbody-${this.id}`],
+          this.callback
+        );
+        this.observer.listenTo(
+          this.$refs[`ohyeahbox-${this.id}`],
+          this.callback
+        );
       }
     },
     callback() {
-      const a = this.$refs.ohyeahbox.getBoundingClientRect(); // 外壳大小
-      const b = this.$refs.ohyeahbody.getBoundingClientRect(); // body大小
+      const a = this.$refs[`ohyeahbox-${this.id}`].getBoundingClientRect(); // 外壳大小
+      const b = this.$refs[`ohyeahbody-${this.id}`].getBoundingClientRect(); // body大小
       this.bodyH = b.height;
       this.bodyW = b.width;
       this.trickH = a.height - 4; // 轨道长度 = box高度 - padding的4px
@@ -244,6 +291,14 @@ export default {
         this.scaleW = 0;
       }
     },
+    // 鼠标进入范围，在开启键盘功能的情况下需要自动获得焦点
+    onBoxMouseEnter() {
+      console.log("来来没有", document.activeElement.nodeName);
+      if (document.activeElement.nodeName === "BODY") {
+        this.$refs[`ohyeahbox-${this.id}`].focus();
+      }
+    },
+
     // 滚动条上鼠标按下 1纵 2横
     onBarMousedown(e, type) {
       e.preventDefault();
@@ -256,6 +311,107 @@ export default {
       this.startBarHScrollTop = this.barHScrollTop;
       this.startBarWScrollLeft = this.barWScrollLeft;
     },
+
+    // 键盘按下
+    onKeyDown(e) {
+      //e.preventDefault();
+      if (/^(INPUT)|(TEXTAREA)|SELECT/.test(document.activeElement.nodeName)) {
+        return;
+      }
+      e.stopImmediatePropagation();
+      // 只监听4个方向键
+      // 已按下
+      if (this.isKeyDown === 2) {
+        return;
+      } else if (this.isKeyDown === 1) {
+        this.smoothScroll(e.which);
+      } else {
+        if (e.which > 36 && e.which < 41) {
+          this.isKeyDown = 1;
+          switch (e.which) {
+            // 左
+            case 37:
+              this.scrollTo(
+                this.barWScrollLeft * this.scaleW - this.movePx,
+                null,
+                250
+              );
+              break;
+            // 上
+            case 38:
+              this.scrollTo(
+                null,
+                this.barHScrollTop * this.scaleH - this.movePx,
+                250
+              );
+              break;
+            // 右
+            case 39:
+              this.scrollTo(
+                this.barWScrollLeft * this.scaleW + this.movePx,
+                null,
+                250
+              );
+              break;
+            // 下
+            case 40:
+              this.scrollTo(
+                null,
+                this.barHScrollTop * this.scaleH + this.movePx,
+                250
+              );
+              break;
+          }
+        }
+      }
+    },
+
+    // 用户长按方向键，启动平滑滚动
+    smoothScroll(which) {
+      this.isKeyDown = 2;
+
+      this.smoothTimer = requestAnimationFrame(() => {
+        this.transSpeed = 0;
+        this.smoothScroll(which);
+        switch (which) {
+          // 左
+          case 37:
+            this.barWScrollLeft = Math.min(
+              Math.max(this.barWScrollLeft - 1, 0),
+              this.trickW - this.barWTall
+            );
+            break;
+          // 上
+          case 38:
+            this.barHScrollTop = Math.min(
+              Math.max(this.barHScrollTop - 1, 0),
+              this.trickH - this.barHTall
+            );
+            break;
+          // 右
+          case 39:
+            this.barWScrollLeft = Math.min(
+              Math.max(this.barWScrollLeft + 1, 0),
+              this.trickW - this.barWTall
+            );
+            break;
+          // 下
+          case 40:
+            this.barHScrollTop = Math.min(
+              Math.max(this.barHScrollTop + 1, 0),
+              this.trickH - this.barHTall
+            );
+            break;
+        }
+      });
+    },
+
+    // 键盘弹起
+    onKeyUp(e) {
+      this.isKeyDown = 0;
+      cancelAnimationFrame(this.smoothTimer);
+    },
+
     // 轨道上鼠标按下
     onTrackMousedown(e, type) {
       e.preventDefault();
@@ -278,7 +434,7 @@ export default {
           }
         }
         if (this.barWDown) {
-          // 在上方点击
+          // 在左方点击
           if (this.barWScrollLeft >= e.offsetX) {
             this.barWScrollLeft = Math.max(e.offsetX - 6, 0);
           } else {
@@ -324,9 +480,10 @@ export default {
     onMouseUp() {
       this.barHDown = this.barWDown = false;
     },
-    //鼠标滚轮事件
+    // 鼠标滚轮事件
     onMouseWheel(e) {
       // 节流
+
       if (!this.timer) {
         let y =
           this.realShowH && e.deltaY
@@ -423,10 +580,11 @@ export default {
   }
 };
 </script>
-<style lang="scss">
+<style lang="less">
 .ohyeah-scroll-box {
   position: relative;
   overflow: hidden;
+  outline: none;
   &.mobile {
     overflow: auto;
     -webkit-overflow-scrolling: touch;

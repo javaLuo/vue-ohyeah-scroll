@@ -1,14 +1,18 @@
 <template>
   <div class="app-box"
        id="app">
-    <ohyeah>
+    <ohyeah :autoHide="false"
+            useKeybord
+            :movePx="1000">
       <p>a</p>
       <p>a</p>
-      <p>a</p>
+      <p style="width:1500px">aa</p>
       <p>a</p>
       <div style="width:300px;height:500px;">
         <ohyeah ref="scroll1"
                 :no-hor="noV"
+                useKeybord
+                :movePx="1000"
                 :autoHide="false"
                 @onVerStart="onVerStart"
                 @onVerEnd="onVerEnd"
@@ -37,12 +41,15 @@
       <button @click="noV = !noV">noV</button>
       <button @click="changeBox">changeBox</button>
       <button @click="onScrollTo">onScrollTo</button>
+      <p><input /></p>
       <p>a</p>
       <p>a</p>
       <p>a</p>
-      <p>a</p>
-      <p>a</p>
-      <p>a</p>
+      <p><textarea /></p>
+      <p><select>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        </select></p>
       <p>a</p>
       <p>a</p>
       <p>a</p>
@@ -63,7 +70,7 @@ export default {
       msg: "Welcome to Your Vue.js App",
       arr: new Array(100).fill("a"),
       noV: false,
-      width: 200
+      width: 800
     };
   },
   components: {
@@ -108,7 +115,7 @@ export default {
   }
 };
 </script>
-<style lang="scss">
+<style lang="less">
 body {
   padding: 0;
   margin: 0;
