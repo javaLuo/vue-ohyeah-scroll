@@ -76,6 +76,8 @@ export default {
 | noVer        | Boolean       | false       | 是否禁用垂直滚动条(overflow-y:hidden)                                                       |
 | noHor        | Boolean       | false       | 是否禁用水平滚动条(overflow-x:hidden)                                                       |
 | minLength    | Number        | 20          | 当内容无限多的时候，滑块最短不得低于此值，单位: px                                          |
+| useKeybord   | Boolean       | false       | 是否启用键盘方向键控制                                                                      |
+| movePx       | Number        | 160         | 当用键盘控制时，单次按键，页面滚动的距离，单位: px                                          |
 | resizeObject | Boolean       | false       | 如果存在监听不到内容高度变化的情况可以把这个值改为true试试，（nuxt.js打包后发现有这种情况） |
 
 ### 自定义事件
@@ -210,6 +212,7 @@ export default {
 - 那么就需要一个具有高度和宽度的父级元素来包裹ohyeah
 
 ### 更新
+- 0.4.0 增加了键盘方向键控制
 - 0.3.0 this.$refs.ohyeah.scrollTo(null, 100); 传递null表示保持原位不动
 - 0.2.9 处理了一下nuxt.js中使用的情况。修复了卸载组件时没有正确卸载容器监听的方法
 - 2019/05/09 处理了嵌套滚动条的事件冒泡问题
