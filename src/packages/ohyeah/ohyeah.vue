@@ -585,6 +585,7 @@ export default {
   position: relative;
   overflow: hidden;
   outline: none;
+  -ms-overflow-style: none;
   &.mobile {
     overflow: auto;
     -webkit-overflow-scrolling: touch;
