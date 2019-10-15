@@ -1,7 +1,7 @@
 {
   "name": "vue-ohyeah-scroll",
   "description": "prettier scroll",
-  "version": "0.4.2",
+  "version": "0.5.0-beta",
   "author": "L <https://blog.isluo.com>",
   "license": "MIT",
   "private": false,
@@ -14,7 +14,8 @@
     "vue",
     "scroll",
     "vue-scroll",
-    "happy-scroll"
+    "happy-scroll",
+    "better-scroll"
   ],
   "files": [
     "dist",

@@ -4,33 +4,22 @@
        :style="`width:${width}px;height:${height}px`">
     <ohyeah ref="scroll1"
             :autoHide="autoHide"
-            :breadth="12"
+            :breadth="6"
             :left="leftTop"
             :top="leftTop"
             :noVer="noVer"
             :noHor="noHor"
+            trackColor="rgba(100,200,100,0.2)"
             @onVerStart="onVerStart"
             @onVerEnd="onVerEnd"
             @onHorStart="onHorStart"
             @onHorEnd="onHorEnd"
             @onScroll="onScroll">
       <div style="height: 51px;background-color: #f00">height: 51px;</div>
-      -
       <a href="#a1">页内锚点</a>
-      <p>a</p>
-      <p style="width:1500px">aa</p>
-      <p>a</p>
-      <!-- <div style="width:300px;height:500px;">
-        <ohyeah ref="scroll1"
-                :no-hor="noV"
-                useKeybord
-                :movePx="1000"
+      <!-- <div style="width:300px;height:500px;background-color: #f0f0f0;border:solid 1px #ccc">
+        <ohyeah ref="scroll2"
                 :autoHide="false"
-                @onVerStart="onVerStart"
-                @onVerEnd="onVerEnd"
-                @onHorStart="onHorStart"
-                @onHorEnd="onHorEnd"
-                @onScroll="onScroll"
                 trackColor="transparent">
           <ul>
             <li v-for="(item,index) in arr"
@@ -41,38 +30,21 @@
           </ul>
         </ohyeah>
       </div> -->
-      <div class="demo-div2"
-           @wheel.stop>
+      <div class="demo-div2">
         <div v-for="(item,index) in arr"
              :key="index">
           {{index}}
         </div>
       </div>
-      <p>a</p>
-      <p>a</p>
-      <p>a</p>
-      <p><textarea /></p>
       <p><select>
-        <option value="1">1</option>
-        <option value="2">2</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
         </select></p>
-            <p><input /></p>
-
-      <p>a</p>
-      <p>a</p>
-      <p>a</p>
-      <p>a</p>
-      <p>a</p>
-      <p>a</p>
-      -
-      <p id="a1">a1</p>
-      <p>a</p>
-      <p><span v-for="(item,index) in arr" :key="index">aa{{index}}</span></p>
-      <p>a</p>
-      <p>a</p>
-      <p>a</p>
-      -
-      <p v-for="(item,index) in arr" :key="index">cccc{{index}}</p>
+      <p><input /></p>
+      <p><span v-for="(item,index) in arr"
+              :key="index">aa{{index}}</span></p>
+      <p v-for="(item,index) in arr"
+         :key="index">cccc{{index}}</p>
       -
     </ohyeah>
     <button @click="onScrollTo">scrollTo</button>
@@ -82,8 +54,8 @@
     <button @click="leftTop=!leftTop">改变位置</button>
     <button @click="noVer=!noVer">禁用垂直</button>
     <button @click="noHor=!noHor">禁用水平</button>
-     <button @click="onAdd">加50条</button>
-      <button @click="onPlus">减20条</button>
+    <button @click="onAdd">加50条</button>
+    <button @click="onPlus">减20条</button>
   </div>
 </template>
 
@@ -95,12 +67,12 @@ export default {
   data() {
     return {
       msg: "Welcome to Your Vue.js App",
-      arr: [],
+      arr: [1, 2, 3, 4, 5, 6, 7, 8, 9],
       noVer: false,
       noHor: false,
       leftTop: false,
       width: 800,
-      height: 500,
+      height: 600,
       autoHide: false
     };
   },
@@ -112,10 +84,10 @@ export default {
   },
   methods: {
     onAdd() {
-      this.arr = [...this.arr, ...new Array(50).fill("b")];
+      this.arr = [...this.arr, ...new Array(20).fill("b")];
     },
     onPlus() {
-      this.arr.splice(-1, 20);
+      this.arr.splice(-20, 20);
       this.arr = this.arr;
       //this.width = this.width - 100;
     },
@@ -139,8 +111,8 @@ export default {
       // console.log("正在滚动：", { obj });
     },
     onChangeSize() {
-      this.width = Math.random() * 200 + 400;
-      this.height = Math.random() * 200 + 400;
+      this.width = Math.random() * 300 + 500;
+      this.height = Math.random() * 300 + 500;
     },
 
     onScrollTo() {

@@ -39,6 +39,7 @@
 </template>
 <script>
 import ElementResizeDetectorMaker from "element-resize-detector";
+let canEmited = 1;
 export default {
   name: "ohyeah",
   data() {
@@ -47,9 +48,6 @@ export default {
       observer: null, // 监听变化
       isShowH: false, // 是否显示垂直滚动条
       isShowW: false, // 是否显示横向滚动条,
-      isKeyDown: 0, // 键盘按下,0未按下/1已按下/2已启动平滑滚动
-      bodyH: 0, // body高
-      bodyW: 0, // body宽
       trickH: 0, // 轨道高 = box高 - padding的4px
       trickW: 0, // 轨道宽
       barHTall: 0, // 垂直滚动条bar高度
@@ -66,8 +64,7 @@ export default {
       scaleW: 0,
       hoverH: false, // H悬浮
       hoverW: false, // W悬浮
-      timer: 0,
-      slow: 0.22
+      timer: 0
     };
   },
   props: {
@@ -147,47 +144,66 @@ export default {
         this.callback();
       }
     },
-    // 监听到顶和到底事件, 数值
+    // 监听到顶和到底事件, 数值 canEmited是为了解决safari回弹效果会多次触发事件
     barHScrollTop(newV) {
+      if (newV < 0 || newV > this.trickH - this.barHTall) {
+        return;
+      }
       const dom = this.$refs[`ohyeahbody-${this.id}`];
-      if (newV <= 0) {
-        this.$emit("onVerStart", dom);
-      } else if (newV >= this.trickH - this.barHTall) {
-        this.$emit("onVerEnd", dom);
+      if (canEmited) {
+        if (newV === 0) {
+          canEmited = false;
+          this.$emit("onVerStart", dom);
+        } else if (newV === this.trickH - this.barHTall) {
+          this.$emit("onVerEnd", dom);
+          canEmited = false;
+        }
+      } else {
+        canEmited = true;
       }
       this.$emit("onScroll", dom);
     },
+
     // 监听到左和到右事件
     barWScrollLeft(newV) {
-      const dom = this.$refs[`ohyeahbody-${this.id}`];
-      if (newV <= 0) {
-        this.$emit("onHorStart", dom);
-      } else if (newV >= this.trickW - this.barWTall) {
-        this.$emit("onHorEnd", dom);
+      if (newV < 0 || newV > this.trickW - this.barWTall) {
+        return;
       }
+      const dom = this.$refs[`ohyeahbody-${this.id}`];
+      if (canEmited) {
+        if (newV === 0) {
+          canEmited = false;
+          this.$emit("onHorStart", dom);
+        } else if (newV === this.trickW - this.barWTall) {
+          canEmited = false;
+          this.$emit("onHorEnd", dom);
+        }
+      } else {
+        canEmited = true;
+      }
+
       this.$emit("onScroll", dom);
     }
   },
   methods: {
-    // 滚动条滚动了,需要重新定位滚动条位置，直接获取scrollTop
-    onScrollEvent(e) {
-      // 节流
-      // console.log("滚动条滚动：", e);
+    /**
+     * 监听滚动条滚动事件
+     * 原生滚动条为主，模拟滚动条跟随原生滚动条位置
+     * 这里不做节流，需要灵敏
+     * **/
+    onScrollEvent() {
       const dom = this.$refs[`ohyeahbody-${this.id}`];
-      requestAnimationFrame(() => {
-        if (this.realShowH) {
-          this.barHScrollTop = dom.scrollTop / this.scaleH;
-        }
-        if (this.realShowW) {
-          this.barWScrollLeft = dom.scrollLeft / this.scaleW;
-        }
-      });
+      if (this.realShowH) {
+        this.barHScrollTop = dom.scrollTop / this.scaleH;
+      }
+      if (this.realShowW) {
+        this.barWScrollLeft = dom.scrollLeft / this.scaleW;
+      }
     },
 
     // 监听容器变化
     listenResize() {
       // 如果支持ResizeObserver就用这个
-      console.log("支持吗：", window.ResizeObserver);
       if (window.ResizeObserver) {
         this.observer = new ResizeObserver(this.callback);
         this.observer.observe(this.$refs[`ohyeahbody-${this.id}`]);
@@ -206,6 +222,7 @@ export default {
         );
       }
     },
+
     /**
      * 容器大小变化后的回调函数
      * 重置是否显示滚动条
@@ -218,17 +235,14 @@ export default {
       console.log("变化了");
       const dom = this.$refs[`ohyeahbody-${this.id}`];
       const b = dom.getBoundingClientRect(); // boxbody大小
-      this.trickH = b.height; // 轨道长度 = box高度 - padding的4px
-      this.trickW = b.width;
+      this.trickH = b.height - 4; // 轨道长度 = box高度 - 上下padding一共4px
+      this.trickW = b.width - 4;
 
       this.isShowH = dom.scrollHeight > dom.clientHeight; // 真实内容高度 > 容器高度，就显示滚动条
       this.isShowW = dom.scrollWidth > dom.clientWidth;
 
       if (this.realShowH) {
-        // 滚动条滚动的距离 * 比例尺 = 内容滚过的距离
-        const temp = this.barHScrollTop * this.scaleH;
-        // 滚动条的高度 =
-        console.log("滚动条高度：", b.height, dom.scrollHeight, this.trickH);
+        // 滚动条的高度 = 真实容器可见高度/真实总高度 * 轨道高度
         this.barHTall = Math.max(
           (dom.clientHeight / dom.scrollHeight) * this.trickH,
           this.minLength > dom.clientHeight ? 0 : this.minLength
@@ -237,17 +251,14 @@ export default {
         this.scaleH =
           (dom.scrollHeight - dom.clientHeight) / (this.trickH - this.barHTall);
         this.barHScrollTop = Math.min(
-          Math.max(temp / this.scaleH, 0),
+          Math.max(dom.scrollTop / this.scaleH, 0),
           this.trickH - this.barHTall
         );
-        dom.scrollTop = this.barHScrollTop * this.scaleH;
       } else {
-        this.barHScrollTop = 0;
         this.scaleH = 0;
         dom.scrollTop = 0;
       }
       if (this.realShowW) {
-        const temp = this.barWScrollLeft * this.scaleW;
         this.barWTall = Math.max(
           (dom.clientWidth / dom.scrollWidth) * this.trickW,
           this.minLength > dom.clientWidth ? 0 : this.minLength
@@ -255,18 +266,21 @@ export default {
         this.scaleW =
           (dom.scrollWidth - dom.clientWidth) / (this.trickW - this.barWTall);
         this.barWScrollLeft = Math.min(
-          Math.max(temp / this.scaleW, 0),
+          Math.max(dom.scrollLeft / this.scaleW, 0),
           this.trickW - this.barWTall
         );
         dom.scrollLeft = this.barWScrollLeft * this.scaleW;
       } else {
-        this.barWScrollLeft = 0;
         this.scaleW = 0;
         dom.scrollLeft = 0;
       }
     },
 
-    // 滚动条上鼠标按下 1纵 2横
+    /**
+     * 鼠标在滑块上按下
+     * @parame e 事件对象，为了得到当前鼠标在滑块上的位置
+     * @params type 1垂直滚动条，2水平滚动条
+     * **/
     onBarMousedown(e, type) {
       e.preventDefault();
       e.stopImmediatePropagation();
@@ -288,13 +302,12 @@ export default {
       e.preventDefault();
       e.stopImmediatePropagation();
       const dom = this.$refs[`ohyeahbody-${this.id}`];
-      let temp;
 
       this.$nextTick(() => {
         if (type === 1) {
           // 在上方点击 这里不能用temp
           if (this.barHScrollTop >= e.offsetY) {
-            this.barHScrollTop = Math.max(e.offsetY - 2, 0);
+            this.barHScrollTop = Math.max(e.offsetY - 6, 0);
           } else {
             this.barHScrollTop = Math.min(
               e.offsetY - this.barHTall + 2,
@@ -306,7 +319,7 @@ export default {
         if (type === 2) {
           // 在左方点击
           if (this.barWScrollLeft >= e.offsetX) {
-            this.barWScrollLeft = Math.max(e.offsetX - 2, 0);
+            this.barWScrollLeft = Math.max(e.offsetX - 6, 0);
           } else {
             this.barWScrollLeft = Math.min(
               e.offsetX - this.barWTall + 2,
@@ -319,6 +332,7 @@ export default {
         this.onBarMousedown(e, type);
       });
     },
+
     // 横向或纵向滚动条被拖拽
     onBarDragMove(e) {
       const dom = this.$refs[`ohyeahbody-${this.id}`];
@@ -348,6 +362,7 @@ export default {
         }
       }
     },
+
     // 鼠标抬起
     onMouseUp() {
       this.barHDown = this.barWDown = false;
@@ -360,7 +375,6 @@ export default {
      * @param time 滚动消耗的时间ms
      * **/
     scrollTo(x, y, time = 0) {
-      console.log("scrollTo:", x, y);
       const dom = this.$refs[`ohyeahbody-${this.id}`];
       const s_y =
         y === "end"
@@ -384,6 +398,9 @@ export default {
         dom.scrollLeft = s_x;
       }
     },
+    /**
+     * 手动获取当前dom信息
+     * **/
     getScrollInfo() {
       const dom = this.$refs[`ohyeahbody-${this.id}`];
       return {
@@ -445,6 +462,7 @@ export default {
     right: 0;
     top: 0;
     z-index: 10;
+    padding: 2px;
     cursor: pointer;
     transition: opacity 200ms, width 200ms;
     &.show {
@@ -465,6 +483,7 @@ export default {
     bottom: 0;
     left: 0;
     z-index: 9;
+    padding: 2px;
     cursor: pointer;
     transition: opacity 200ms, height 200ms;
     &.show {
