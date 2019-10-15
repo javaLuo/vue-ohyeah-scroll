@@ -1,14 +1,26 @@
 <template>
   <div class="app-box"
-       id="app">
-    <ohyeah :autoHide="false"
-            useKeybord
-            :movePx="1000">
-      <p>a</p>
+       id="app"
+       :style="`width:${width}px;height:${height}px`">
+    <ohyeah ref="scroll1"
+            :autoHide="autoHide"
+            :breadth="12"
+            :left="leftTop"
+            :top="leftTop"
+            :noVer="noVer"
+            :noHor="noHor"
+            @onVerStart="onVerStart"
+            @onVerEnd="onVerEnd"
+            @onHorStart="onHorStart"
+            @onHorEnd="onHorEnd"
+            @onScroll="onScroll">
+      <div style="height: 51px;background-color: #f00">height: 51px;</div>
+      -
+      <a href="#a1">页内锚点</a>
       <p>a</p>
       <p style="width:1500px">aa</p>
       <p>a</p>
-      <div style="width:300px;height:500px;">
+      <!-- <div style="width:300px;height:500px;">
         <ohyeah ref="scroll1"
                 :no-hor="noV"
                 useKeybord
@@ -28,7 +40,7 @@
             </li>
           </ul>
         </ohyeah>
-      </div>
+      </div> -->
       <div class="demo-div2"
            @wheel.stop>
         <div v-for="(item,index) in arr"
@@ -36,12 +48,6 @@
           {{index}}
         </div>
       </div>
-      <button @click="add">add</button>
-      <button @click="plus">plus</button>
-      <button @click="noV = !noV">noV</button>
-      <button @click="changeBox">changeBox</button>
-      <button @click="onScrollTo">onScrollTo</button>
-      <p><input /></p>
       <p>a</p>
       <p>a</p>
       <p>a</p>
@@ -50,13 +56,34 @@
         <option value="1">1</option>
         <option value="2">2</option>
         </select></p>
+            <p><input /></p>
+
       <p>a</p>
       <p>a</p>
       <p>a</p>
       <p>a</p>
       <p>a</p>
       <p>a</p>
+      -
+      <p id="a1">a1</p>
+      <p>a</p>
+      <p><span v-for="(item,index) in arr" :key="index">aa{{index}}</span></p>
+      <p>a</p>
+      <p>a</p>
+      <p>a</p>
+      -
+      <p v-for="(item,index) in arr" :key="index">cccc{{index}}</p>
+      -
     </ohyeah>
+    <button @click="onScrollTo">scrollTo</button>
+    <button @click="ongetScrollInfo">手动获取信息</button>
+    <button @click="autoHide=!autoHide">是否自动隐藏</button>
+    <button @click="onChangeSize">随机改变容器大小</button>
+    <button @click="leftTop=!leftTop">改变位置</button>
+    <button @click="noVer=!noVer">禁用垂直</button>
+    <button @click="noHor=!noHor">禁用水平</button>
+     <button @click="onAdd">加50条</button>
+      <button @click="onPlus">减20条</button>
   </div>
 </template>
 
@@ -68,9 +95,13 @@ export default {
   data() {
     return {
       msg: "Welcome to Your Vue.js App",
-      arr: new Array(100).fill("a"),
-      noV: false,
-      width: 800
+      arr: [],
+      noVer: false,
+      noHor: false,
+      leftTop: false,
+      width: 800,
+      height: 500,
+      autoHide: false
     };
   },
   components: {
@@ -80,14 +111,18 @@ export default {
     // console.log("什么情况：", OhyeahScroll);
   },
   methods: {
-    add() {
-      this.arr.push(this.arr.length + 1);
-      this.width = this.width + 100;
+    onAdd() {
+      this.arr = [...this.arr, ...new Array(50).fill("b")];
     },
-    plus() {
-      this.arr.splice(-1, 1);
+    onPlus() {
+      this.arr.splice(-1, 20);
+      this.arr = this.arr;
       //this.width = this.width - 100;
     },
+    ongetScrollInfo() {
+      console.log(this.$refs.scroll1.getScrollInfo());
+    },
+
     changeBox() {
       console.log("change?");
       // this.$refs.box.style.height = Math.random() * 200 + 300 + "px";
@@ -95,16 +130,21 @@ export default {
       this.$refs.box.style.height = 25 + "px";
     },
     onVerStart(obj) {
-      console.log("到顶了：", obj);
+      console.log("到顶了：", { obj });
     },
     onVerEnd(obj) {
-      console.log("到底了：", obj);
+      console.log("到底了：", { obj });
     },
     onScroll(obj) {
-      //console.log("正在滚动：", obj);
+      // console.log("正在滚动：", { obj });
     },
+    onChangeSize() {
+      this.width = Math.random() * 200 + 400;
+      this.height = Math.random() * 200 + 400;
+    },
+
     onScrollTo() {
-      this.$refs.scroll1.scrollTo("end", null, 300);
+      this.$refs.scroll1.scrollTo(100, 50, 300);
     },
     onHorStart(obj) {
       console.log("到左了：", obj);
@@ -123,10 +163,7 @@ body {
 }
 .app-box {
   position: relative;
-  height: 500px;
-  width: 800px;
   border: solid 1px #ccc;
-  padding: 20px;
 }
 .demo-div {
   width: 300px;
