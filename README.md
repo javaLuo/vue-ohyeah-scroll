@@ -11,14 +11,16 @@
 | IE10, IE11, Edge                                                                                                                                                                                                | last 2 versions                                                                                                                                                                                                   | last 2 versions                                                                                                                                                                                               | last 2 versions                                                                                                                                                                                               | last 2 versions                                                                                                                                                                                           |
 
 ### 重构待测
-1. 测嵌套
+1. 测嵌套 👌
 2. 触发各事件 👌
 3. 平滑滚动
 4. 锚点跳转 👌
-5. 键盘事件，仍然需要一个自动focus的操作
+5. 键盘事件 👌
 6. 变颜色，换位置，随机改变大小 👌
 7. 各方法测试 👌
-8. safari 多次触发触底触顶事件
+8. safari 多次触发触底触顶事件 👌
+9. 整理代码  👌
+10. padding 2px  👌
 ### 特性
 
 - [x] 默认是 MAC 系统的主题，也可以自定义轨道和滑块颜色
