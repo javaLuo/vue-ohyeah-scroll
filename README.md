@@ -80,6 +80,7 @@ export default {
 
 | 属性名       | 类型          | 默认值      | 描述                                                                                        |
 | ------------ | ------------- | ----------- | ------------------------------------------------------------------------------------------- |
+| id           | String        | 随机数      | 一个唯一的ID，可以不填                                                                      |
 | width        | Number,String | 100%        | 容器宽度，默认贴合父级(父级需要有宽度)，也可自己设置，接受合法的CSS值，传数字会转换成px     |
 | height       | Number,String | 100%        | 容器高度，默认贴合父级(父级需要有高度)，也可自己设置，接受合法的CSS值，传数字会转换成px     |
 | breadth      | Number        | 6           | 滑块的粗细，单位: px                                                                        |
@@ -91,7 +92,6 @@ export default {
 | noVer        | Boolean       | false       | 是否禁用垂直滚动条(overflow-y:hidden)                                                       |
 | noHor        | Boolean       | false       | 是否禁用水平滚动条(overflow-x:hidden)                                                       |
 | minLength    | Number        | 20          | 当内容无限多的时候，滑块最短不得低于此值，单位: px                                          |
-                                        |
 | resizeObject | Boolean       | false       | 如果存在监听不到内容高度变化的情况可以把这个值改为true试试，（nuxt.js打包后发现有这种情况） |
 
 ### 自定义事件
@@ -146,10 +146,10 @@ export default {
 
 ### 自身方法
 
-| 方法名        | 参数       | 描述                     |
-| ------------- | ---------- | ------------------------ |
-| scrollTo      | (x,y,time) | 将滚动条滚动到指定的位置 |
-| getScrollInfo | 无         | 获取当前滚动条各种信息   |
+| 方法名        | 参数                                 | 描述                                                |
+| ------------- | ------------------------------------ | --------------------------------------------------- |
+| scrollTo      | (x:number,y:number,isSmooth:boolean) | 滚动到指定的位置,x水平，y垂直, isSmooth是否平滑过度 |
+| getScrollInfo | 无                                   | 获取当前滚动条各种信息                              |
 
 
 如何使用自身方法：
@@ -157,32 +157,36 @@ export default {
 ```js
   <template>
     <!-- 需要定义一个ref -->
-    <ohyeah ref="ohyeah">
+    <Ohyeah ref="oh1">
       ...
-    </ohyeah>
+    </Ohyeah>
   </template>
 
   <script>
     export default {
       methods:{
         scrollTo(){
-          // 水平保持原位，垂直滚100个像素，在300ms内完成
-          this.$refs.ohyeah.scrollTo(null, 100, 300);
+          // 水平保持原位，垂直滚到100px处，平滑过度
+          this.$refs.oh1.scrollTo(null, 100, true);
         },
         scrollToEnd(){
           // 水平滚到最左边，垂直滚到底，瞬间完成
-          this.$refs.ohyeah.scrollTo(0, 'end', 0);
+          this.$refs.oh1.scrollTo(0, 'end', false);
         },
         getScrollInfo(){
           // 获取当前滚动条各种信息
-          const msg = this.$refs.ohyeah.getScrollInfo();
+          const msg = this.$refs.oh1.getScrollInfo();
           /**
-           * offsetHeight: 内容区的总高度,
-           * offsetWidth: 内容区的总宽度,
-           * height: 容器的高度,
-           * width: 容器的宽度,
+           * height: 内容区可见高度,不包括边框
+           * width: 内容区可见宽度,不包括边框
+           * clientHeight: 同height,
+           * clientWidth: 同width,
+           * offsetHeight: 内容区高度,包括边框
+           * offsetWidth: 内容区宽度，包括边框,
            * scrollTop: 内容区已被滚到上边去的距离,
-           * scrollLeft: 内容区已被滚到左边去的距离
+           * scrollLeft: 内容区已被滚到左边去的距离,
+           * scrollHeight: 内容区真实总高度,包括看不见的区域
+           * scrollWidth: 内容区真实总宽度,包括看不见的区域
            * */
         }
       }
@@ -192,16 +196,13 @@ export default {
 
 ### 完整例子
 
-```js
+```vue
   <template>
     <!-- 若不设置ohyeah的width和height, 则需要一个具有高度和宽度的容器来包裹ohyeah -->
     <div style="height:100vh; width:50%;">
-      <ohyeah
-        :autoHide="false"
-        @onVerStart="console.log('到顶了')"
-      >
-        <div v-for="(item,index) in testData" :key="index">{{index}}</div>
-      </ohyeah>
+      <Ohyeah>
+        <p v-for="(item,index) in data" :key="index">{{index}}</p>
+      </Ohyeah>
     </div>
   </template>
 
@@ -210,7 +211,7 @@ export default {
     export default {
       data(){
         return {
-          testData: new Array(100).fill("")
+          data: new Array(100).fill("")
         }
       }
       components:{
@@ -222,10 +223,21 @@ export default {
 
 ### 注意事项
 
-- 如果你不设置ohyeah的width和height属性，或者设置为百分比，
-- 那么就需要一个具有高度和宽度的父级元素来包裹ohyeah
+1.
+> **scrollTo(x,y,isSmooth)** 方法<br/>
+> x number 为要水平滚动到的目标位置，单位px<br/>
+> y number 为要垂直滚动到的目标位置，单位px<br/>
+> isSmooth boolean 是否需要平滑滚动<br/>
+> 平滑滚动使用的是`scroll-behavior: smooth;`,目前`chrome`,`firefox`,`opera`支持<br/>
+> **但是**：浏览器水平滚动条和垂直滚动条是互斥的，当水平正在滚时，垂直滚不动，反之亦然。浏览器始终只会有一个方向处于滚动中<br/>
+> **所以**：如果设置了`isSmooth`为`true`,那么不要同时设置x和y,至少有一个应该为`null`<br/>
+
+2.
+> 如果你不设置ohyeah的width和height属性，或者设置为百分比，那么就需要一个具有高度和宽度的父级元素来包裹ohyeah
+
 
 ### 更新
+- 0.5.x 重构了,现在基于原生滚动条的默认行为
 - 0.4.0 增加了键盘方向键控制
 - 0.3.0 this.$refs.ohyeah.scrollTo(null, 100); 传递null表示保持原位不动
 - 0.2.9 处理了一下nuxt.js中使用的情况。修复了卸载组件时没有正确卸载容器监听的方法
