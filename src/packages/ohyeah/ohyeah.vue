@@ -28,6 +28,7 @@
     <div :ref="`ohyeahbody-${id}`"
          :class="['ohyeah-scroll-body',{'isSmooth': needSmooth}]"
          :style="`${noVer ? 'height:100%;overflow-y:hidden;' : ''} ${noHor ? 'width:100%;overflow-x:hidden;' : ''}`"
+         tabindex="9999"
          @scroll="onScrollEvent">
       <div :ref="`ohyeahbodylistener-${id}`">
         <slot></slot>
@@ -44,7 +45,6 @@ export default {
   name: "ohyeah",
   data() {
     return {
-      isMobile: false,
       observer: null, // 监听变化
       isShowH: false, // 是否显示垂直滚动条
       isShowW: false, // 是否显示横向滚动条,
@@ -66,7 +66,8 @@ export default {
       hoverW: false, // W悬浮
       timer: 0, // 节流所使用的timer
       reqTimer: null, // requestAnimationFrame所使用的timer
-      needSmooth: true
+      needSmooth: true, // 是否需要平滑滚动 鼠标拖拽滑块时不需要，其他时候需要
+      isBehavior: false // 是否支持原生平滑滚动
     };
   },
   props: {
@@ -86,20 +87,16 @@ export default {
   },
   mounted() {
     // 监听内部宽高变化，用于调整滚动条大小和位置
-    this.isMobile = /(android)|(iphone)|(symbianos)|(windows phone)|(ipad)|(ipod)/.test(
-      navigator.userAgent.toLowerCase()
-    );
     this.callback();
     this.listenResize();
+    // 是否支持原生平滑滚动,chrome/firefox/opera支持
+    this.isBehavior = "scroll-behavior" in document.body.style;
     // 监听鼠标拖动事件
     document.addEventListener("mousemove", this.onBarDragMove, false);
     document.addEventListener("mouseup", this.onMouseUp, false);
   },
   beforeDestroy() {
     // 卸载鼠标拖动事件
-    // if (this.isMobile) {
-    //   return;
-    // }
     document.removeEventListener("mousemove", this.onBarDragMove, false);
     document.removeEventListener("mouseup", this.onMouseUp, false);
 
@@ -305,19 +302,21 @@ export default {
      * **/
     onBarMousedown(e, type, targetNum) {
       e.preventDefault();
-      this.needSmooth = false;
+      // 是否来自点击轨道，点击轨道需要保持平滑
+      const isTargetSmooth = targetNum || targetNum === 0;
+      // 非轨道点击 或 是轨道点击但不支持原生滚动（会启动动画，不需要smooth）
+      if (!isTargetSmooth || (isTargetSmooth && !this.isBehavior)) {
+        this.needSmooth = false;
+      }
+
       this.barHDown = type === 1;
       this.barWDown = type === 2;
       this.startX = e.clientX;
       this.startY = e.clientY;
       this.startBarHScrollTop =
-        this.barHDown && Number.isFinite(targetNum)
-          ? targetNum
-          : this.barHScrollTop; // 记录当前滚动条的位置
+        this.barHDown && isTargetSmooth ? targetNum : this.barHScrollTop; // 记录当前滚动条的位置
       this.startBarWScrollLeft =
-        this.barWDown && Number.isFinite(targetNum)
-          ? targetNum
-          : this.barWScrollLeft;
+        this.barWDown && isTargetSmooth ? targetNum : this.barWScrollLeft;
     },
 
     /**
@@ -327,7 +326,7 @@ export default {
      * **/
     onTrackMousedown(e, type) {
       e.preventDefault();
-      this.needSmooth = false;
+      // this.needSmooth = false;
       const dom = this.$refs[`ohyeahbody-${this.id}`];
       let temp;
       this.$nextTick(() => {
@@ -342,16 +341,20 @@ export default {
               this.trickH - this.barHTall
             );
           }
-          targetNum = temp * this.scaleH;
-          // 步进值 / 15 约等于 256ms
-          cancelAnimationFrame(this.reqTimer);
-          this.smoothScrollTo(
-            "scrollTop",
-            dom,
-            targetNum,
-            (targetNum - dom.scrollTop) / 15
-          );
-          // dom.scrollTop = this.barHScrollTop * this.scaleH;
+
+          if (this.isBehavior) {
+            dom.scrollTop = temp * this.scaleH;
+          } else {
+            targetNum = temp * this.scaleH;
+            // 步进值 / 15 约等于 256ms
+            cancelAnimationFrame(this.reqTimer);
+            this.smoothScrollTo(
+              "scrollTop",
+              dom,
+              targetNum,
+              (targetNum - dom.scrollTop) / 15
+            );
+          }
         }
         if (type === 2) {
           // 在左方点击
@@ -363,15 +366,19 @@ export default {
               this.trickW - this.barWTall
             );
           }
-          targetNum = temp * this.scaleW;
-          cancelAnimationFrame(this.reqTimer);
-          this.smoothScrollTo(
-            "scrollLeft",
-            dom,
-            targetNum,
-            (targetNum - dom.scrollLeft) / 15
-          );
-          // dom.scrollLeft = this.barWScrollLeft * this.scaleW;
+
+          if (this.isBehavior) {
+            dom.scrollLeft = temp * this.scaleW;
+          } else {
+            targetNum = temp * this.scaleW;
+            cancelAnimationFrame(this.reqTimer);
+            this.smoothScrollTo(
+              "scrollLeft",
+              dom,
+              targetNum,
+              (targetNum - dom.scrollLeft) / 15
+            );
+          }
         }
         // 为了按下后直接拖动时的位置校准
         this.onBarMousedown(e, type, temp);
@@ -384,7 +391,9 @@ export default {
      * **/
     onBarDragMove(e) {
       const dom = this.$refs[`ohyeahbody-${this.id}`];
+
       if (this.barHDown) {
+        this.needSmooth = false;
         if (!this.timer) {
           cancelAnimationFrame(this.reqTimer);
           requestAnimationFrame(() => {
@@ -398,6 +407,7 @@ export default {
           this.timer = 1;
         }
       } else if (this.barWDown) {
+        this.needSmooth = false;
         if (!this.timer) {
           cancelAnimationFrame(this.reqTimer);
           requestAnimationFrame(() => {
@@ -475,6 +485,10 @@ export default {
         if (this.realShowW && (x || x === 0)) {
           dom.scrollLeft = s_x;
         }
+        // firefox 设置scrollTop不会触发scroll事件,手动触发一下
+        if (!smooth) {
+          this.onScrollEvent();
+        }
       });
     },
     /**
@@ -514,6 +528,9 @@ export default {
     -ms-overflow-style: none;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
+    * {
+      -ms-overflow-style: auto;
+    }
     &.isSmooth {
       scroll-behavior: smooth;
     }
