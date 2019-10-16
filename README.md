@@ -13,17 +13,17 @@
 ### 重构待测
 1. 测嵌套 👌
 2. 触发各事件 👌
-3. 平滑滚动
+3. 平滑滚动 👌
 4. 锚点跳转 👌
 5. 键盘事件 👌
 6. 变颜色，换位置，随机改变大小 👌
 7. 各方法测试 👌
 8. safari 多次触发触底触顶事件 👌
-9. 整理代码  👌
-10. padding 2px  👌
-11. firefox scrollTo滚动到顶部 模拟滚动条没动
-12. IE11 轨道上点击，位置没对
-13. 轨道上点击 needSmooth问题
+9. 整理代码 👌
+10. padding 2px 👌
+11. firefox scrollTo滚动到顶部 模拟滚动条没动 👌 firefox不触发scroll事件
+12. IE11 轨道上点击，位置没对 👌 IE11不支持Number.isFinite
+13. 轨道上点击 needSmooth问题 👌
 
 ### 特性
 
@@ -50,7 +50,7 @@
 全局注册
 
 ```js
-import Ohyeah from 'vue-ohyeah-scroll';
+import { Ohyeah } from 'vue-ohyeah-scroll';
 Vue.use(Ohyeah);
 ```
 
@@ -70,9 +70,9 @@ export default {
 
 ```js
 <template>
-  <ohyeah width="100vw" height="100vh">
+  <Ohyeah width="100vw" height="100vh">
     ...
-  </ohyeah>
+  </Ohyeah>
 </template>
 ```
 
@@ -91,8 +91,7 @@ export default {
 | noVer        | Boolean       | false       | 是否禁用垂直滚动条(overflow-y:hidden)                                                       |
 | noHor        | Boolean       | false       | 是否禁用水平滚动条(overflow-x:hidden)                                                       |
 | minLength    | Number        | 20          | 当内容无限多的时候，滑块最短不得低于此值，单位: px                                          |
-| useKeybord   | Boolean       | false       | 是否启用键盘方向键控制                                                                      |
-| movePx       | Number        | 160         | 当用键盘控制时，单次按键，页面滚动的距离，单位: px                                          |
+                                        |
 | resizeObject | Boolean       | false       | 如果存在监听不到内容高度变化的情况可以把这个值改为true试试，（nuxt.js打包后发现有这种情况） |
 
 ### 自定义事件
