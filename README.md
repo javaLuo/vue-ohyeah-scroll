@@ -78,21 +78,21 @@ export default {
 
 ### 自定义属性
 
-| 属性名       | 类型          | 默认值      | 描述                                                                                        |
-| ------------ | ------------- | ----------- | ------------------------------------------------------------------------------------------- |
-| id           | String        | 随机数      | 一个唯一的ID，可以不填                                                                      |
-| width        | Number,String | 100%        | 容器宽度，默认贴合父级(父级需要有宽度)，也可自己设置，接受合法的CSS值，传数字会转换成px     |
-| height       | Number,String | 100%        | 容器高度，默认贴合父级(父级需要有高度)，也可自己设置，接受合法的CSS值，传数字会转换成px     |
-| breadth      | Number        | 6           | 滑块的粗细，单位: px                                                                        |
-| thumbColor   | String        | #7f7f7f     | 滑块的颜色，接受 CSS 颜色值                                                                 |
-| trackColor   | String        | transparent | 轨道的颜色，接受 CSS 颜色值                                                                 |
-| autoHide     | Boolean       | true        | 是否自动隐藏滚动条，鼠标在区域内才显示                                                      |
-| left         | Boolean       | false       | 是否把垂直滚动条放在容器的左边                                                              |
-| top          | Boolean       | false       | 是否把水平滚动条放在容器的顶端                                                              |
-| noVer        | Boolean       | false       | 是否禁用垂直滚动条(overflow-y:hidden)                                                       |
-| noHor        | Boolean       | false       | 是否禁用水平滚动条(overflow-x:hidden)                                                       |
-| minLength    | Number        | 20          | 当内容无限多的时候，滑块最短不得低于此值，单位: px                                          |
-| resizeObject | Boolean       | false       | 如果存在监听不到内容高度变化的情况可以把这个值改为true试试，（nuxt.js打包后发现有这种情况） |
+| 属性名       | 类型          | 默认值      | 描述                                                                                               |
+| ------------ | ------------- | ----------- | -------------------------------------------------------------------------------------------------- |
+| id           | String        | 随机数      | 一个唯一的ID，可以不填                                                                             |
+| width        | Number,String | 100%        | 容器宽度，默认贴合父级(父级需要有宽度)，也可自己设置，接受合法的CSS值，传数字会转换成px            |
+| height       | Number,String | 100%        | 容器高度，默认贴合父级(父级需要有高度)，也可自己设置，接受合法的CSS值，传数字会转换成px            |
+| breadth      | Number        | 6           | 滑块的粗细，单位: px                                                                               |
+| thumbColor   | String        | #7f7f7f     | 滑块的颜色，接受 CSS 颜色值                                                                        |
+| trackColor   | String        | transparent | 轨道的颜色，接受 CSS 颜色值                                                                        |
+| autoHide     | Boolean       | true        | 是否自动隐藏滚动条，鼠标在区域内才显示                                                             |
+| left         | Boolean       | false       | 是否把垂直滚动条放在容器的左边                                                                     |
+| top          | Boolean       | false       | 是否把水平滚动条放在容器的顶端                                                                     |
+| noVer        | Boolean       | false       | 是否禁用垂直滚动条(overflow-y:hidden)                                                              |
+| noHor        | Boolean       | false       | 是否禁用水平滚动条(overflow-x:hidden)                                                              |
+| minLength    | Number        | 20          | 当内容无限多的时候，滑块最短不得低于此值，单位: px                                                 |
+| resizeObject | Boolean       | false       | 如果存在监听不到内容高度变化的情况可以把这个值改为true试试，（nuxt.js打包后firefox发现有这种情况） |
 
 ### 自定义事件
 
@@ -154,7 +154,7 @@ export default {
 
 如何使用自身方法：
 
-```js
+```vue
   <template>
     <!-- 需要定义一个ref -->
     <Ohyeah ref="oh1">
@@ -201,7 +201,7 @@ export default {
     <!-- 若不设置ohyeah的width和height, 则需要一个具有高度和宽度的容器来包裹ohyeah -->
     <div style="height:100vh; width:50%;">
       <Ohyeah>
-        <p v-for="(item,index) in data" :key="index">{{index}}</p>
+        <p v-for="(item,index) in testData" :key="index">{{index}}</p>
       </Ohyeah>
     </div>
   </template>
@@ -211,7 +211,7 @@ export default {
     export default {
       data(){
         return {
-          data: new Array(100).fill("")
+          testData: new Array(100).fill("")
         }
       }
       components:{
@@ -225,9 +225,6 @@ export default {
 
 1.
 > **scrollTo(x,y,isSmooth)** 方法<br/>
-> x number 为要水平滚动到的目标位置，单位px<br/>
-> y number 为要垂直滚动到的目标位置，单位px<br/>
-> isSmooth boolean 是否需要平滑滚动<br/>
 > 平滑滚动使用的是`scroll-behavior: smooth;`,目前`chrome`,`firefox`,`opera`支持<br/>
 > **但是**：浏览器水平滚动条和垂直滚动条是互斥的，当水平正在滚时，垂直滚不动，反之亦然。浏览器始终只会有一个方向处于滚动中<br/>
 > **所以**：如果设置了`isSmooth`为`true`,那么不要同时设置x和y,至少有一个应该为`null`<br/>
