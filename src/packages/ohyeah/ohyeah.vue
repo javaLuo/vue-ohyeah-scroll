@@ -26,8 +26,7 @@
     </div>
     <!-- 默认内容 -->
     <div :ref="`ohyeahbody-${id}`"
-         class="ohyeah-scroll-body"
-         tabindex="9999"
+         :class="['ohyeah-scroll-body',{'isSmooth': needSmooth}]"
          :style="`${noVer ? 'height:100%;overflow-y:hidden;' : ''} ${noHor ? 'width:100%;overflow-x:hidden;' : ''}`"
          @scroll="onScrollEvent">
       <div :ref="`ohyeahbodylistener-${id}`">
@@ -40,6 +39,7 @@
 <script>
 import ElementResizeDetectorMaker from "element-resize-detector";
 let canEmited = 1;
+
 export default {
   name: "ohyeah",
   data() {
@@ -64,7 +64,9 @@ export default {
       scaleW: 0,
       hoverH: false, // H悬浮
       hoverW: false, // W悬浮
-      timer: 0
+      timer: 0, // 节流所使用的timer
+      reqTimer: null, // requestAnimationFrame所使用的timer
+      needSmooth: true
     };
   },
   props: {
@@ -90,16 +92,16 @@ export default {
     this.callback();
     this.listenResize();
     // 监听鼠标拖动事件
-    document.addEventListener("mousemove", this.onBarDragMove);
-    document.addEventListener("mouseup", this.onMouseUp);
+    document.addEventListener("mousemove", this.onBarDragMove, false);
+    document.addEventListener("mouseup", this.onMouseUp, false);
   },
   beforeDestroy() {
     // 卸载鼠标拖动事件
-    if (this.isMobile) {
-      return;
-    }
-    document.removeEventListener("mousemove", this.onBarDragMove);
-    document.removeEventListener("mouseup", this.onMouseUp);
+    // if (this.isMobile) {
+    //   return;
+    // }
+    document.removeEventListener("mousemove", this.onBarDragMove, false);
+    document.removeEventListener("mouseup", this.onMouseUp, false);
 
     if (window.ResizeObserver) {
       this.observer.disconnect();
@@ -150,18 +152,28 @@ export default {
         return;
       }
       const dom = this.$refs[`ohyeahbody-${this.id}`];
+      const p = {
+        offsetHeight: dom.offsetHeight,
+        offsetWidth: dom.offsetWidth,
+        clientHeight: dom.clientHeight,
+        clientWidth: dom.clientWidth,
+        scrollHeight: dom.scrollHeight,
+        scrollWidth: dom.scrollWidth,
+        scrollTop: dom.scrollTop,
+        scrollLeft: dom.scrollLeft
+      };
       if (canEmited) {
         if (newV === 0) {
           canEmited = false;
-          this.$emit("onVerStart", dom);
+          this.$emit("onVerStart", p, dom);
         } else if (newV === this.trickH - this.barHTall) {
-          this.$emit("onVerEnd", dom);
+          this.$emit("onVerEnd", p, dom);
           canEmited = false;
         }
       } else {
         canEmited = true;
       }
-      this.$emit("onScroll", dom);
+      this.$emit("onScroll", p, dom);
     },
 
     // 监听到左和到右事件
@@ -170,19 +182,29 @@ export default {
         return;
       }
       const dom = this.$refs[`ohyeahbody-${this.id}`];
+      const p = {
+        offsetHeight: dom.offsetHeight,
+        offsetWidth: dom.offsetWidth,
+        clientHeight: dom.clientHeight,
+        clientWidth: dom.clientWidth,
+        scrollHeight: dom.scrollHeight,
+        scrollWidth: dom.scrollWidth,
+        scrollTop: dom.scrollTop,
+        scrollLeft: dom.scrollLeft
+      };
       if (canEmited) {
         if (newV === 0) {
           canEmited = false;
-          this.$emit("onHorStart", dom);
+          this.$emit("onHorStart", p, dom);
         } else if (newV === this.trickW - this.barWTall) {
           canEmited = false;
-          this.$emit("onHorEnd", dom);
+          this.$emit("onHorEnd", p, dom);
         }
       } else {
         canEmited = true;
       }
 
-      this.$emit("onScroll", dom);
+      this.$emit("onScroll", p, dom);
     }
   },
   methods: {
@@ -232,7 +254,6 @@ export default {
      * 重置真实滚动条位置
      * **/
     callback() {
-      console.log("变化了");
       const dom = this.$refs[`ohyeahbody-${this.id}`];
       const b = dom.getBoundingClientRect(); // boxbody大小
       this.trickH = b.height - 4; // 轨道长度 = box高度 - 上下padding一共4px
@@ -280,17 +301,23 @@ export default {
      * 鼠标在滑块上按下
      * @parame e 事件对象，为了得到当前鼠标在滑块上的位置
      * @params type 1垂直滚动条，2水平滚动条
+     * @params targetNum 目标位置，用于在轨道上点击时瞬间记录最终位置，因为滚动可能为平滑滚动
      * **/
-    onBarMousedown(e, type) {
+    onBarMousedown(e, type, targetNum) {
       e.preventDefault();
-      e.stopImmediatePropagation();
-
+      this.needSmooth = false;
       this.barHDown = type === 1;
       this.barWDown = type === 2;
       this.startX = e.clientX;
       this.startY = e.clientY;
-      this.startBarHScrollTop = this.barHScrollTop; // 记录当前滚动条的位置
-      this.startBarWScrollLeft = this.barWScrollLeft;
+      this.startBarHScrollTop =
+        this.barHDown && Number.isFinite(targetNum)
+          ? targetNum
+          : this.barHScrollTop; // 记录当前滚动条的位置
+      this.startBarWScrollLeft =
+        this.barWDown && Number.isFinite(targetNum)
+          ? targetNum
+          : this.barWScrollLeft;
     },
 
     /**
@@ -300,44 +327,66 @@ export default {
      * **/
     onTrackMousedown(e, type) {
       e.preventDefault();
-      e.stopImmediatePropagation();
+      this.needSmooth = false;
       const dom = this.$refs[`ohyeahbody-${this.id}`];
-
+      let temp;
       this.$nextTick(() => {
+        let targetNum;
         if (type === 1) {
           // 在上方点击 这里不能用temp
           if (this.barHScrollTop >= e.offsetY) {
-            this.barHScrollTop = Math.max(e.offsetY - 6, 0);
+            temp = Math.max(e.offsetY - 6, 0);
           } else {
-            this.barHScrollTop = Math.min(
+            temp = Math.min(
               e.offsetY - this.barHTall + 2,
               this.trickH - this.barHTall
             );
           }
-          dom.scrollTop = this.barHScrollTop * this.scaleH;
+          targetNum = temp * this.scaleH;
+          // 步进值 / 15 约等于 256ms
+          cancelAnimationFrame(this.reqTimer);
+          this.smoothScrollTo(
+            "scrollTop",
+            dom,
+            targetNum,
+            (targetNum - dom.scrollTop) / 15
+          );
+          // dom.scrollTop = this.barHScrollTop * this.scaleH;
         }
         if (type === 2) {
           // 在左方点击
           if (this.barWScrollLeft >= e.offsetX) {
-            this.barWScrollLeft = Math.max(e.offsetX - 6, 0);
+            temp = Math.max(e.offsetX - 6, 0);
           } else {
-            this.barWScrollLeft = Math.min(
+            temp = Math.min(
               e.offsetX - this.barWTall + 2,
               this.trickW - this.barWTall
             );
           }
-          dom.scrollLeft = this.barWScrollLeft * this.scaleW;
+          targetNum = temp * this.scaleW;
+          cancelAnimationFrame(this.reqTimer);
+          this.smoothScrollTo(
+            "scrollLeft",
+            dom,
+            targetNum,
+            (targetNum - dom.scrollLeft) / 15
+          );
+          // dom.scrollLeft = this.barWScrollLeft * this.scaleW;
         }
         // 为了按下后直接拖动时的位置校准
-        this.onBarMousedown(e, type);
+        this.onBarMousedown(e, type, temp);
       });
     },
 
-    // 横向或纵向滚动条被拖拽
+    /**
+     * 横向或纵向滚动条被拖拽
+     * @param e 拖动时的事件对象，为了实时获取鼠标位置
+     * **/
     onBarDragMove(e) {
       const dom = this.$refs[`ohyeahbody-${this.id}`];
       if (this.barHDown) {
         if (!this.timer) {
+          cancelAnimationFrame(this.reqTimer);
           requestAnimationFrame(() => {
             const temp = Math.min(
               Math.max(this.startBarHScrollTop + e.clientY - this.startY, 0),
@@ -350,6 +399,7 @@ export default {
         }
       } else if (this.barWDown) {
         if (!this.timer) {
+          cancelAnimationFrame(this.reqTimer);
           requestAnimationFrame(() => {
             const temp = Math.min(
               Math.max(this.startBarWScrollLeft + e.clientX - this.startX, 0),
@@ -366,15 +416,44 @@ export default {
     // 鼠标抬起
     onMouseUp() {
       this.barHDown = this.barWDown = false;
+      this.needSmooth = true;
+    },
+
+    /**
+     * 平滑scrollTo
+     * @param type scrollTop/scrollLeft
+     * @param dom DOM对象
+     * @param targetNum 目标值
+     * @param step 步进值
+     * */
+    smoothScrollTo(type, dom, targetNum, step) {
+      this.reqTimer = requestAnimationFrame(() => {
+        if (
+          (step < 0 && dom[type] > targetNum) ||
+          (step > 0 && dom[type] < targetNum)
+        ) {
+          dom[type] = dom[type] + step;
+          if (Math.abs(targetNum - dom[type]) < Math.abs(step)) {
+            this.smoothScrollTo(
+              type,
+              dom,
+              targetNum,
+              Math.abs(targetNum - dom[type]) * (step < 0 ? -1 : 1)
+            );
+          } else {
+            this.smoothScrollTo(type, dom, targetNum, step);
+          }
+        }
+      });
     },
 
     /**
      * 滚动到指定位置
      * @param x 水平真实滚动距离，null保持不变/'end'滚到底
      * @param y 垂直真实滚动距离，null保持不变/'end'滚到底
-     * @param time 滚动消耗的时间ms
+     * @param smooth 是否平滑滚动
      * **/
-    scrollTo(x, y, time = 0) {
+    scrollTo(x, y, smooth) {
       const dom = this.$refs[`ohyeahbody-${this.id}`];
       const s_y =
         y === "end"
@@ -388,15 +467,15 @@ export default {
           : x && this.scaleW > 0
           ? x
           : 0;
-
-      if (this.realShowH && (y || y === 0)) {
-        // const temp = Math.min(Math.max(s_y, 0), this.trickH - this.barHTall);
-        dom.scrollTop = s_y;
-      }
-      if (this.realShowW && (x || x === 0)) {
-        // const temp = Math.min(Math.max(s_x, 0), this.trickW - this.barWTall);
-        dom.scrollLeft = s_x;
-      }
+      this.needSmooth = !!smooth;
+      this.$nextTick(() => {
+        if (this.realShowH && (y || y === 0)) {
+          dom.scrollTop = s_y;
+        }
+        if (this.realShowW && (x || x === 0)) {
+          dom.scrollLeft = s_x;
+        }
+      });
     },
     /**
      * 手动获取当前dom信息
@@ -434,6 +513,11 @@ export default {
     overflow: auto;
     -ms-overflow-style: none;
     scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    &.isSmooth {
+      scroll-behavior: smooth;
+    }
+
     &::-webkit-scrollbar {
       display: none;
     }

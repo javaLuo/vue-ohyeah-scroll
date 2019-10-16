@@ -9,7 +9,6 @@
             :top="leftTop"
             :noVer="noVer"
             :noHor="noHor"
-            trackColor="rgba(100,200,100,0.2)"
             @onVerStart="onVerStart"
             @onVerEnd="onVerEnd"
             @onHorStart="onHorStart"
@@ -46,9 +45,11 @@
       <p v-for="(item,index) in arr"
          :key="index">cccc{{index}}</p>
       -
+      <div id="a1">a1</div>
     </ohyeah>
     <button @click="onScrollTo">scrollTo</button>
     <button @click="ongetScrollInfo">手动获取信息</button>
+    <button @click="onToTop">移动到顶部</button>
     <button @click="autoHide=!autoHide">是否自动隐藏</button>
     <button @click="onChangeSize">随机改变容器大小</button>
     <button @click="leftTop=!leftTop">改变位置</button>
@@ -114,7 +115,9 @@ export default {
       this.width = Math.random() * 300 + 500;
       this.height = Math.random() * 300 + 500;
     },
-
+    onToTop() {
+      this.$refs.scroll1.scrollTo(0, 0, true);
+    },
     onScrollTo() {
       this.$refs.scroll1.scrollTo(100, 50, 300);
     },
