@@ -25,6 +25,7 @@
 11. firefox scrollTo 滚动到顶部 模拟滚动条没动 👌 firefox 不触发 scroll 事件
 12. IE11 轨道上点击，位置没对 👌 IE11 不支持 Number.isFinite
 13. 轨道上点击 needSmooth 问题 👌
+14. 移动端不渲染，样式还原
 
 ### 特性
 
