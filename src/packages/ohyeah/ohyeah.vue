@@ -42,7 +42,7 @@ import ElementResizeDetectorMaker from "element-resize-detector";
 let canEmited = 1;
 
 export default {
-  name: "ohyeah",
+  name: "Ohyeah",
   data() {
     return {
       observer: null, // 监听变化
@@ -525,7 +525,7 @@ export default {
     width: 100%;
     outline: none;
     overflow: auto;
-    -ms-overflow-style: none;
+    -ms-overflow-style: none !important;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
     * {

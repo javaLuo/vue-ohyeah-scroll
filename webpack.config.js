@@ -11,7 +11,7 @@ module.exports = {
     path: path.resolve(__dirname, "./dist"),
     publicPath: "/dist/",
     filename: NODE_ENV == "development" ? "build.js" : "ohyeah-scroll.js",
-    library: "ohyeah",
+    library: "Ohyeah",
     libraryTarget: "umd",
     umdNamedDefine: true,
   },

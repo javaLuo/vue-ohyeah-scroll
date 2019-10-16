@@ -2,7 +2,7 @@
   <div class="app-box"
        id="app"
        :style="`width:${width}px;height:${height}px`">
-    <ohyeah ref="scroll1"
+    <Ohyeah ref="scroll1"
             :autoHide="autoHide"
             :breadth="6"
             :left="leftTop"
@@ -46,7 +46,7 @@
          :key="index">cccc{{index}}</p>
       -
       <div id="a1">a1</div>
-    </ohyeah>
+    </Ohyeah>
     <button @click="onScrollTo">scrollTo</button>
     <button @click="ongetScrollInfo">手动获取信息</button>
     <button @click="onToTop">移动到顶部</button>
@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import Ohyeah from "./packages/ohyeah";
+// import Ohyeah from "./packages/ohyeah";
 // import { Ohyeah } from "../dist/ohyeah-scroll";
 export default {
   name: "app",
@@ -77,9 +77,9 @@ export default {
       autoHide: false
     };
   },
-  components: {
-    Ohyeah
-  },
+  // components: {
+  //   Ohyeah
+  // },
   mounted() {
     // console.log("什么情况：", OhyeahScroll);
   },
