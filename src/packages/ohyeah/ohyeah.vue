@@ -551,16 +551,17 @@ export default {
       }
     }
     /* 移动端时生效 解决安卓默认不显示dom滚动条 */
-    &.isMobile {
-      &::-webkit-scrollbar {
-        width: 2px;
-        height: 2px;
-        background-color: transparent;
-      }
-      &::-webkit-scrollbar-thumb {
-        background-color: #7f7f7f;
-      }
-    }
+    // 算了，自定义的滚动条不好看，还不如没有
+    // &.isMobile {
+    //   &::-webkit-scrollbar {
+    //     width: 2px;
+    //     height: 2px;
+    //     background-color: transparent;
+    //   }
+    //   &::-webkit-scrollbar-thumb {
+    //     background-color: #7f7f7f;
+    //   }
+    // }
 
     &.isSmooth {
       scroll-behavior: smooth;
