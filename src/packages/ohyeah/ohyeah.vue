@@ -30,7 +30,8 @@
          :style="`${noVer ? 'height:100%;overflow-y:hidden;' : ''} ${noHor ? 'width:100%;overflow-x:hidden;' : ''}`"
          tabindex="9999"
          @scroll="onScrollEvent">
-      <div :ref="`ohyeahbodylistener-${id}`">
+      <div class="ohyeah-scroll-content"
+           :ref="`ohyeahbodylistener-${id}`">
         <slot></slot>
       </div>
     </div>
