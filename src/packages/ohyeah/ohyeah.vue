@@ -3,7 +3,7 @@
        :style="`width:${theWidth};height:${theHeight}`"
        class="ohyeah-scroll-box">
     <!-- 纵向滚动条 -->
-    <div v-if="!noVer"
+    <div v-if="!noVer && !isMobile"
          @mousedown.stop="onTrackMousedown($event,1)"
          @mouseenter.stop="hoverH = true"
          @mouseleave.stop="hoverH = false"
@@ -14,7 +14,7 @@
            :style="`transition:width 250ms,height 250ms;background-color:${thumbColor};width:${(hoverH || barHDown )? breadth + 4 : breadth}px;height: ${barHTall}px;transform: translateY(${barHScrollTop}px);border-radius:${breadth}px`" />
     </div>
     <!-- 横向滚动条 -->
-    <div v-if="!noHor"
+    <div v-if="!noHor && !isMobile"
          @mousedown.stop="onTrackMousedown($event,2)"
          @mouseenter.stop="hoverW = true"
          @mouseleave.stop="hoverW = false"
@@ -26,7 +26,7 @@
     </div>
     <!-- 默认内容 -->
     <div :ref="`ohyeahbody-${id}`"
-         :class="['ohyeah-scroll-body',{'isSmooth': needSmooth}]"
+         :class="['ohyeah-scroll-body',{'isPc': !isMobile},{'isSmooth': needSmooth}]"
          :style="`${noVer ? 'height:100%;overflow-y:hidden;' : ''} ${noHor ? 'width:100%;overflow-x:hidden;' : ''}`"
          tabindex="9999"
          @scroll="onScrollEvent">
@@ -45,6 +45,7 @@ export default {
   name: "Ohyeah",
   data() {
     return {
+      isMobile: false,
       observer: null, // 监听变化
       isShowH: false, // 是否显示垂直滚动条
       isShowW: false, // 是否显示横向滚动条,
@@ -86,19 +87,29 @@ export default {
     resizeObject: { type: Boolean, default: false } // resize模式，默认scroll
   },
   mounted() {
+    // 是否为移动端
+    this.isMobile = /(android)|(iphone)|(symbianos)|(windows phone)|(ipad)|(ipod)/.test(
+      navigator.userAgent.toLowerCase()
+    );
+    // 是否支持原生平滑滚动,chrome/firefox/opera支持
+    this.isBehavior = "scroll-behavior" in document.body.style;
+
     // 监听内部宽高变化，用于调整滚动条大小和位置
     this.callback();
     this.listenResize();
-    // 是否支持原生平滑滚动,chrome/firefox/opera支持
-    this.isBehavior = "scroll-behavior" in document.body.style;
-    // 监听鼠标拖动事件
-    document.addEventListener("mousemove", this.onBarDragMove, false);
-    document.addEventListener("mouseup", this.onMouseUp, false);
+
+    if (!this.isMobile) {
+      // 监听鼠标拖动事件
+      document.addEventListener("mousemove", this.onBarDragMove, false);
+      document.addEventListener("mouseup", this.onMouseUp, false);
+    }
   },
   beforeDestroy() {
     // 卸载鼠标拖动事件
-    document.removeEventListener("mousemove", this.onBarDragMove, false);
-    document.removeEventListener("mouseup", this.onMouseUp, false);
+    if (!this.isMobile) {
+      document.removeEventListener("mousemove", this.onBarDragMove, false);
+      document.removeEventListener("mouseup", this.onMouseUp, false);
+    }
 
     if (window.ResizeObserver) {
       this.observer.disconnect();
@@ -525,18 +536,20 @@ export default {
     width: 100%;
     outline: none;
     overflow: auto;
-    -ms-overflow-style: none !important;
-    scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
     * {
       -ms-overflow-style: auto;
     }
+    &.isPc {
+      -ms-overflow-style: none !important; // IE/Edge
+      scrollbar-width: none; // Firefox
+      // Chrome/Safari/Opera
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
     &.isSmooth {
       scroll-behavior: smooth;
-    }
-
-    &::-webkit-scrollbar {
-      display: none;
     }
   }
 
