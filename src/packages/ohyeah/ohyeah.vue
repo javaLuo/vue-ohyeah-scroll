@@ -26,7 +26,7 @@
     </div>
     <!-- 默认内容 -->
     <div :ref="`ohyeahbody-${id}`"
-         :class="['ohyeah-scroll-body',{'isPc': !isMobile},{'isSmooth': needSmooth}]"
+         :class="['ohyeah-scroll-body',{'isPc': !isMobile},{'isMobile': isMobile},{'isSmooth': needSmooth}]"
          :style="`${noVer ? 'height:100%;overflow-y:hidden;' : ''} ${noHor ? 'width:100%;overflow-x:hidden;' : ''}`"
          tabindex="9999"
          @scroll="onScrollEvent">
@@ -541,6 +541,7 @@ export default {
     * {
       -ms-overflow-style: auto;
     }
+    /* PC端时生效 隐藏默认滚动条 */
     &.isPc {
       -ms-overflow-style: none !important; // IE/Edge
       scrollbar-width: none; // Firefox
@@ -549,6 +550,18 @@ export default {
         display: none;
       }
     }
+    /* 移动端时生效 解决安卓默认不显示dom滚动条 */
+    &.isMobile {
+      &::-webkit-scrollbar {
+        width: 2px;
+        height: 2px;
+        background-color: transparent;
+      }
+      &::-webkit-scrollbar-thumb {
+        background-color: #7f7f7f;
+      }
+    }
+
     &.isSmooth {
       scroll-behavior: smooth;
     }
