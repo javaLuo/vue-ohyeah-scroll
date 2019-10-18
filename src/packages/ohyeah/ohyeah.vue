@@ -26,7 +26,7 @@
     </div>
     <!-- 默认内容 -->
     <div :ref="`ohyeahbody-${id}`"
-         :class="['ohyeah-scroll-body',{'isPc': !isMobile},{'isMobile': isMobile},{'isSmooth': needSmooth}]"
+         :class="['ohyeah-scroll-body',{'isPc': !isMobile},{'isAndroid': isAndroid},{'isSmooth': needSmooth}]"
          :style="`${noVer ? 'height:100%;overflow-y:hidden;' : ''} ${noHor ? 'width:100%;overflow-x:hidden;' : ''}`"
          tabindex="9999"
          @scroll="onScrollEvent">
@@ -47,6 +47,7 @@ export default {
   data() {
     return {
       isMobile: false,
+      isAndroid: false,
       observer: null, // 监听变化
       isShowH: false, // 是否显示垂直滚动条
       isShowW: false, // 是否显示横向滚动条,
@@ -92,6 +93,8 @@ export default {
     this.isMobile = /(android)|(iphone)|(symbianos)|(windows phone)|(ipad)|(ipod)/.test(
       navigator.userAgent.toLowerCase()
     );
+    this.isAndroid = /android/.test(navigator.userAgent.toLowerCase());
+
     // 是否支持原生平滑滚动,chrome/firefox/opera支持
     this.isBehavior = "scroll-behavior" in document.body.style;
 
@@ -552,16 +555,17 @@ export default {
     }
     /* 移动端时生效 解决安卓默认不显示dom滚动条 */
     // 算了，自定义的滚动条不好看，还不如没有
-    // &.isMobile {
-    //   &::-webkit-scrollbar {
-    //     width: 2px;
-    //     height: 2px;
-    //     background-color: transparent;
-    //   }
-    //   &::-webkit-scrollbar-thumb {
-    //     background-color: #7f7f7f;
-    //   }
-    // }
+    &.isAndroid {
+      &::-webkit-scrollbar {
+        width: 2px;
+        height: 2px;
+        padding: 1px;
+        background-color: transparent;
+      }
+      &::-webkit-scrollbar-thumb {
+        background-color: rgba(180, 180, 180, 0.4);
+      }
+    }
 
     &.isSmooth {
       scroll-behavior: smooth;
