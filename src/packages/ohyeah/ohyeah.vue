@@ -224,7 +224,7 @@ export default {
      * 监听滚动条滚动事件
      * 原生滚动条为主，模拟滚动条跟随原生滚动条位置
      * 这里不做节流，需要灵敏
-     * **/
+     * */
     onScrollEvent() {
       const dom = this.$refs[`ohyeahbody-${this.id}`];
       if (this.realShowH) {
@@ -264,7 +264,7 @@ export default {
      * 重置轨道高度
      * 重置滑块高度
      * 重置真实滚动条位置
-     * **/
+     * */
     callback() {
       const dom = this.$refs[`ohyeahbody-${this.id}`];
       const b = dom.getBoundingClientRect(); // boxbody大小
@@ -314,7 +314,7 @@ export default {
      * @parame e 事件对象，为了得到当前鼠标在滑块上的位置
      * @params type 1垂直滚动条，2水平滚动条
      * @params targetNum 目标位置，用于在轨道上点击时瞬间记录最终位置，因为滚动可能为平滑滚动
-     * **/
+     * */
     onBarMousedown(e, type, targetNum) {
       e.preventDefault();
       // 是否来自点击轨道，点击轨道需要保持平滑
@@ -338,7 +338,7 @@ export default {
      * 轨道上鼠标按下
      * @param e 事件对象
      * @param type 1垂直滚动条/2水平滚动条
-     * **/
+     * */
     onTrackMousedown(e, type) {
       e.preventDefault();
       // this.needSmooth = false;
@@ -403,7 +403,7 @@ export default {
     /**
      * 横向或纵向滚动条被拖拽
      * @param e 拖动时的事件对象，为了实时获取鼠标位置
-     * **/
+     * */
     onBarDragMove(e) {
       const dom = this.$refs[`ohyeahbody-${this.id}`];
 
@@ -477,7 +477,7 @@ export default {
      * @param x 水平真实滚动距离，null保持不变/'end'滚到底
      * @param y 垂直真实滚动距离，null保持不变/'end'滚到底
      * @param smooth 是否平滑滚动
-     * **/
+     * */
     scrollTo(x, y, smooth) {
       const dom = this.$refs[`ohyeahbody-${this.id}`];
       const s_y =
@@ -508,7 +508,7 @@ export default {
     },
     /**
      * 手动获取当前dom信息
-     * **/
+     * */
     getScrollInfo() {
       const dom = this.$refs[`ohyeahbody-${this.id}`];
       return {
@@ -554,16 +554,14 @@ export default {
       }
     }
     /* 移动端时生效 解决安卓默认不显示dom滚动条 */
-    // 算了，自定义的滚动条不好看，还不如没有
     &.isAndroid {
       &::-webkit-scrollbar {
         width: 2px;
         height: 2px;
-        padding: 1px;
         background-color: transparent;
       }
       &::-webkit-scrollbar-thumb {
-        background-color: rgba(180, 180, 180, 0.4);
+        background-color: rgba(200, 200, 200, 0.4);
       }
     }
 
@@ -572,10 +570,6 @@ export default {
     }
   }
 
-  &.mobile {
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-  }
   &:hover {
     & > .ohyeah-scroll-vertical-track-h,
     & > .ohyeah-scroll-vertical-track-w {
